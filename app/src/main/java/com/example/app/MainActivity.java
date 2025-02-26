@@ -92,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
         pedirPermisoNotificaciones();
         noti();
         restoreTheme();
-
     }
     private void restoreTheme() {
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
