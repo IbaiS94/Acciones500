@@ -45,6 +45,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     public static final String PREFS_NAME = "ThemePreferences";
     public static final String THEME_KEY = "isDarkMode";
+    private boolean modfavorito = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,12 +57,15 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        modfavorito = getIntent().getBooleanExtra("favs", Boolean.FALSE);
+
         RecyclerView recyclerView = findViewById(R.id.rv);
         List<String> listaDatos = new ArrayList<>();
         StockDB db = new StockDB(this);
         Cursor cursor = db.obtenerNombres();
         //db.insertar("Apple",Boolean.FALSE); //Mover a StockDB para que no se genere cada vez
-        if(getIntent().getBooleanExtra("favs",Boolean.FALSE)){
+        if(modfavorito){
             while(cursor.moveToNext()){
                 if(cursor.getInt(2) == 1){
                     listaDatos.add(cursor.getString(1));
@@ -93,6 +98,19 @@ public class MainActivity extends AppCompatActivity {
         noti();
         restoreTheme();
     }
+
+    @Override
+    public void onBackPressed() {
+        if (modfavorito) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("favs", Boolean.FALSE);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     private void restoreTheme() {
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         boolean isDarkMode = preferences.getBoolean(THEME_KEY, false); // false es el valor por defecto
@@ -142,7 +160,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                intent.putExtra("favs", Boolean.TRUE);
+                intent.putExtra("favs", !modfavorito);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
             }
@@ -150,6 +169,8 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
+
+
 
 
     private void pedirPermisoNotificaciones() {
@@ -193,5 +214,3 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
-
-

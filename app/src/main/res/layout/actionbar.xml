@@ -5,7 +5,7 @@
     android:id="@+id/bottom_toolbar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:background="@color/material_dynamic_neutral90"
+    android:background="@color/cardview_dark_background"
     android:elevation="8dp"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
     app:titleTextColor="@android:color/white">
