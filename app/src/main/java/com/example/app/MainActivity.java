@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -41,6 +42,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.example.app.FragmentAntiguo;
+import com.example.app.FragmentAntiguo;
+
 
 public class MainActivity extends AppCompatActivity {
     public static final String PREFS_NAME = "ThemePreferences";
@@ -52,6 +56,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container_antiguo, new FragmentAntiguo())
+                    .replace(R.id.container_nuevo, new FragmentNuevo())
+                    .commit();
+        }
+
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -96,8 +109,9 @@ public class MainActivity extends AppCompatActivity {
         cursor.close();
         pedirPermisoNotificaciones();
 
- noti();
+        noti();
         restoreTheme();
+
     }
     @Override
     public void onBackPressed() {
