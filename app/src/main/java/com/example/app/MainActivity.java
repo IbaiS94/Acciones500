@@ -95,10 +95,10 @@ public class MainActivity extends AppCompatActivity {
         ///////
         cursor.close();
         pedirPermisoNotificaciones();
-        noti();
+
+ noti();
         restoreTheme();
     }
-
     @Override
     public void onBackPressed() {
         if (modfavorito) {
