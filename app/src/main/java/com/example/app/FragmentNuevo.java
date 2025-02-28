@@ -15,7 +15,6 @@ public class FragmentNuevo extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        // Infla el layout específico para este fragment
         return inflater.inflate(R.layout.activity_main, container, false);
     }
 }
