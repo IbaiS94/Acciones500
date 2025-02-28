@@ -42,8 +42,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.example.app.FragmentAntiguo;
-import com.example.app.FragmentAntiguo;
+
 
 
 public class MainActivity extends AppCompatActivity {
@@ -59,12 +58,12 @@ public class MainActivity extends AppCompatActivity {
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container_antiguo, new FragmentAntiguo())
-                    .replace(R.id.container_nuevo, new FragmentNuevo())
+                    .replace(R.id.container_antiguo, new com.example.app.FragmentAntiguo())
+                    .replace(R.id.container_nuevo, new com.example.app.FragmentNuevo())
                     .commit();
         }
 
-
+        //da null
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
