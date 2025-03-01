@@ -91,10 +91,10 @@ public class MainActivity extends AppCompatActivity {
 
             }}
 
-
+        if(recyclerView != null){
         com.example.app.AdaptadorRv adapt = new com.example.app.AdaptadorRv(this, listaDatos);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapt);
+        recyclerView.setAdapter(adapt);}
         Toolbar toolbar = findViewById(R.id.bottom_toolbar);
         setSupportActionBar(toolbar);
 
