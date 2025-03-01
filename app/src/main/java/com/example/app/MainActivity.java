@@ -36,6 +36,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -92,7 +93,8 @@ public class MainActivity extends AppCompatActivity {
             }}
 
         if(recyclerView != null){
-        com.example.app.AdaptadorRv adapt = new com.example.app.AdaptadorRv(this, listaDatos);
+            Log.d("DEBUG","NO ES NULL EL RECYCLER");
+            com.example.app.AdaptadorRv adapt = new com.example.app.AdaptadorRv(this, listaDatos);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapt);}
         Toolbar toolbar = findViewById(R.id.bottom_toolbar);
