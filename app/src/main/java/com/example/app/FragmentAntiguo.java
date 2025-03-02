@@ -15,6 +15,16 @@ public class FragmentAntiguo extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.saludo, container, false);
+        return inflater.inflate(R.layout.frameizq, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity != null) {
+            mainActivity.logicaLista();
+            mainActivity.pedirPermisoNotificaciones();
+        }
     }
 }

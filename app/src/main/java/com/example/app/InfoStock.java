@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +24,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,15 +39,41 @@ public class InfoStock extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.stock);
-        StockDB db = new StockDB(this);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.cv), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+        Toolbar toolbar = findViewById(R.id.bottom_toolbar);
+        setSupportActionBar(toolbar);
+
+        gestionInfo(null, null);
+    }
+
+    public void gestionInfo(String nombre, StockDB db2){
+        StockDB db;
+        if (db2 == null) {
+            db = new StockDB(this);
+        } else {
+            db = db2;
+        }
         Cursor cursor = db.obtenerDescripcion();
 
 
         ////
+        String nombreI;
+        if(nombre == null){
         FILE_NAME = getIntent().getStringExtra("nombre").toString()+ ".txt";
+        nombreI = getIntent().getStringExtra("nombre");
+        }
+        else{
+        FILE_NAME=nombre+ ".txt";
+        nombreI = null;}
         ////
         while (cursor.moveToNext()) {
-            if (getIntent().getStringExtra("nombre").equals(cursor.getString(1))) {
+            String nombreC = cursor.getString(1);
+            if ((nombre != null && nombre.equals(nombreC)) || (nombreI != null && nombreI.equals(nombreC)))  {
                 TextView name = findViewById(R.id.stockName);
                 nombre = cursor.getString(1);
                 name.setText(nombre);
@@ -64,15 +92,6 @@ public class InfoStock extends AppCompatActivity {
                 sim.setText(cursor.getString(5));
             }
         }
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.cv), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-        Toolbar toolbar = findViewById(R.id.bottom_toolbar);
-        setSupportActionBar(toolbar);
-
-
         /////
 
         notasEditText = findViewById(R.id.notas);
@@ -81,6 +100,19 @@ public class InfoStock extends AppCompatActivity {
         if (notasGuardadas != null) {
             notasEditText.setText(notasGuardadas);
         }
+        TextView tradingView = findViewById(R.id.tradingView);
+        tradingView.setClickable(Boolean.TRUE);
+        tradingView.setOnClickListener(b -> {
+            Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.tradingview.tradingviewapp");
+            if (launchIntent != null) {
+                startActivity(launchIntent);
+            } else {
+                Intent playStoreIntent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("market://details?id=com.tradingview.tradingviewapp"));
+                startActivity(playStoreIntent);
+            }
+        });
+
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -3,6 +3,9 @@ import android.app.SearchManager;
 
 import static androidx.core.content.ContextCompat.checkSelfPermission;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -38,6 +41,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.FragmentOnAttachListener;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -59,21 +63,39 @@ public class MainActivity extends AppCompatActivity {
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container_antiguo, new com.example.app.FragmentAntiguo())
                     .replace(R.id.container_nuevo, new com.example.app.FragmentNuevo())
+                    .replace(R.id.container_antiguo, new com.example.app.FragmentAntiguo())
                     .commit();
         }
 
         //da null
+        if(findViewById(R.id.main) == null){
+            Log.d("FAKE NEWS", "MAIN NULL");
+        }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        Toolbar toolbar = findViewById(R.id.bottom_toolbar);
+        setSupportActionBar(toolbar);
+        logicaLista();
+        pedirPermisoNotificaciones();
 
-        modfavorito = getIntent().getBooleanExtra("favs", Boolean.FALSE);
+        noti();
+        restoreTheme();
+
+    }
+    public void infoStockCall(String nombre){
+        InfoStock infoStock = new InfoStock();
+        StockDB db = new StockDB(this);
+        infoStock.gestionInfo(nombre, db);
+    }
+    public void logicaLista(){
+        modfavorito = getIntent().getBooleanExtra("favs", FALSE);
 
         RecyclerView recyclerView = findViewById(R.id.rv);
+        Log.d("DEBUG", String.valueOf(recyclerView));
         List<String> listaDatos = new ArrayList<>();
         StockDB db = new StockDB(this);
         Cursor cursor = db.obtenerNombres();
@@ -93,12 +115,10 @@ public class MainActivity extends AppCompatActivity {
             }}
 
         if(recyclerView != null){
-            Log.d("DEBUG","NO ES NULL EL RECYCLER");
             com.example.app.AdaptadorRv adapt = new com.example.app.AdaptadorRv(this, listaDatos);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapt);}
-        Toolbar toolbar = findViewById(R.id.bottom_toolbar);
-        setSupportActionBar(toolbar);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setAdapter(adapt);}
+
 
         if (cursor.moveToFirst()) {
             Integer nombre = cursor.getCount();
@@ -106,19 +126,13 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "No hay datos", Toast.LENGTH_SHORT).show();
         }
-        ///////
         cursor.close();
-        pedirPermisoNotificaciones();
-
-        noti();
-        restoreTheme();
-
     }
     @Override
     public void onBackPressed() {
         if (modfavorito) {
             Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra("favs", Boolean.FALSE);
+            intent.putExtra("favs", FALSE);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         } else {
@@ -136,59 +150,58 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        MenuItem boton = menu.findItem(R.id.action_tema);
-        boton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int currentMode = AppCompatDelegate.getDefaultNightMode();
-                boolean isDarkMode = currentMode != AppCompatDelegate.MODE_NIGHT_YES;
+            getMenuInflater().inflate(R.menu.menu, menu);
+            MenuItem boton = menu.findItem(R.id.action_tema);
+            boton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    int currentMode = AppCompatDelegate.getDefaultNightMode();
+                    boolean isDarkMode = currentMode != AppCompatDelegate.MODE_NIGHT_YES;
 
-                // Guardar la preferencia
-                SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putBoolean(THEME_KEY, isDarkMode);
-                editor.apply();
+                    // Guardar la preferencia
+                    SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putBoolean(THEME_KEY, isDarkMode);
+                    editor.apply();
 
-                // Aplicar el tema
-                AppCompatDelegate.setDefaultNightMode(
-                        isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
-                );
+                    // Aplicar el tema
+                    AppCompatDelegate.setDefaultNightMode(
+                            isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
+                    );
 
-                recreate();
-                return true;
-            }
-        });
+                    recreate();
+                    return true;
+                }
+            });
 
-        MenuItem boton2 = menu.findItem(R.id.action_search);
-        boton2.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-                intent.putExtra(SearchManager.QUERY, "Acciones noticias");
-                startActivity(intent);
-                return true;
-            }
-        });
-        MenuItem boton3 = menu.findItem(R.id.fav_menu);
-        boton3.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                intent.putExtra("favs", !modfavorito);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                return true;
-            }
-        });
-
+            MenuItem boton2 = menu.findItem(R.id.action_search);
+            boton2.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+                    intent.putExtra(SearchManager.QUERY, "Acciones noticias");
+                    startActivity(intent);
+                    return true;
+                }
+            });
+            MenuItem boton3 = menu.findItem(R.id.fav_menu);
+            boton3.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                    intent.putExtra("favs", !modfavorito);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                    return true;
+                }
+            });
         return true;
     }
 
 
 
 
-    private void pedirPermisoNotificaciones() {
+    public void pedirPermisoNotificaciones() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
                 PackageManager.PERMISSION_GRANTED) {
             //PEDIR EL PERMISO

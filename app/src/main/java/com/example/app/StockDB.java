@@ -7,6 +7,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class StockDB extends SQLiteOpenHelper {
         private static final String DB = "stock.db";
@@ -196,6 +197,7 @@ public class StockDB extends SQLiteOpenHelper {
             return db.rawQuery("SELECT * FROM " + "Stocks", null);
         }
         public Cursor obtenerDescripcion() {
+            Log.d("This en StockDB", String.valueOf(this.getReadableDatabase()));
             SQLiteDatabase db = this.getReadableDatabase();
             return db.rawQuery("SELECT * FROM " + "Detalles", null);
     }

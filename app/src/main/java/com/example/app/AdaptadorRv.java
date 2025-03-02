@@ -1,10 +1,12 @@
 package com.example.app; // Cambia esto por el nombre de tu paquete
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -60,7 +63,6 @@ public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> 
         return listaItems.size();
     }
 
-    // Clase interna del ViewHolder
     public class MiViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView textoItem;
@@ -105,11 +107,27 @@ public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> 
         public void onClick(View v) {
             int posicion = getAdapterPosition();
             if (posicion != RecyclerView.NO_POSITION) {
-                Intent intent = new Intent(context, InfoStock.class);
-                intent.putExtra("nombre", listaItems.get(posicion));
-                context.startActivity(intent);
+                View containerNuevo = ((Activity) context).findViewById(R.id.container_nuevo);
+                if (containerNuevo != null) {
+                    //modo landscape
+                    FragmentNuevo fragment = new FragmentNuevo();
+                    Bundle args = new Bundle();
+                    args.putString("nombre", listaItems.get(posicion));
+                    fragment.setArguments(args);
+                    ((AppCompatActivity) context).getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.container_nuevo, fragment)
+                            .commit();
+
+                } else {
+                    //modo portrait
+                    Intent intent = new Intent(context, InfoStock.class);
+                    intent.putExtra("nombre", listaItems.get(posicion));
+                    context.startActivity(intent);
+                }
             }
         }
+
 
 
     }
