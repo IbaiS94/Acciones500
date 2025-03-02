@@ -24,7 +24,7 @@ import java.io.InputStreamReader;
 
 public class FragmentNuevo extends Fragment {
 
-    private String nombre = "Error";
+    public String nombre = "Error";
     private EditText notasEditText;
     private String FILE_NAME;
 
@@ -64,6 +64,9 @@ public class FragmentNuevo extends Fragment {
                     (nombreI != null && nombreI.equals(nombreC))) {
                 TextView nameTextView = view.findViewById(R.id.stockName);
                 nombre = nombreC;
+                if (listener != null) {
+                    listener.onNombreActualizado(nombre);
+                }
                 nameTextView.setText(nombre);
 
                 TextView descTextView = view.findViewById(R.id.stockDescription);
@@ -105,6 +108,21 @@ public class FragmentNuevo extends Fragment {
     }
 
 
+    public interface OnNombreActualizadoListener {
+        void onNombreActualizado(String nombreActualizado);
+    }
+
+    private OnNombreActualizadoListener listener;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof OnNombreActualizadoListener) {
+            listener = (OnNombreActualizadoListener) context;
+        } else {
+            throw new RuntimeException();
+        }
+    }
     private void guardarNotas() {
         String texto = notasEditText.getText().toString();
         Context context = getContext();

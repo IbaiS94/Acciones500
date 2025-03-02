@@ -50,10 +50,12 @@ import java.util.List;
 
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnNombreActualizadoListener {
     public static final String PREFS_NAME = "ThemePreferences";
     public static final String THEME_KEY = "isDarkMode";
     private boolean modfavorito = false;
+
+    private String nombre = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +87,11 @@ public class MainActivity extends AppCompatActivity {
         noti();
         restoreTheme();
 
+    }
+    @Override
+    public void onNombreActualizado(String nombreActualizado) {
+        Log.d("NombreActualizado", nombreActualizado);
+        nombre = nombreActualizado;
     }
     public void infoStockCall(String nombre){
         InfoStock infoStock = new InfoStock();
@@ -179,7 +186,10 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-                    intent.putExtra(SearchManager.QUERY, "Acciones noticias");
+                    String busqueda = "Acciones noticias";
+                    if(!nombre.equals("")){
+                    busqueda = "Acción "+nombre;}
+                    intent.putExtra(SearchManager.QUERY, busqueda);
                     startActivity(intent);
                     return true;
                 }
