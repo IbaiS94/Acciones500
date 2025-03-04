@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="bottom"
+    android:background="@color/material_dynamic_neutral30">
+
+    <TextView
+        android:id="@+id/textViewFooterCredits"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Desarrollado por Ibai Sologuesto para la asignatura de Desarrollo Avanzado del Software"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        android:gravity="center" />
+</LinearLayout>

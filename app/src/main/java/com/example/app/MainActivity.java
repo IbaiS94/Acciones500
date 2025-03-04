@@ -31,6 +31,8 @@ import android.widget.Toast;
 import android.Manifest;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
@@ -38,12 +40,16 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentOnAttachListener;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +62,9 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
     private boolean modfavorito = false;
 
     private String nombre = "";
+
+    private DrawerLayout drawer;
+    private ActionBarDrawerToggle toggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +90,26 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
         });
         Toolbar toolbar = findViewById(R.id.bottom_toolbar);
         setSupportActionBar(toolbar);
+
+        drawer = findViewById(R.id.drawer_layout);
+        toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
+                R.string.nav_abrir, R.string.nav_cerar);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.nav_1) {
+                } else if (id == R.id.nav_2) {
+                }
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
         logicaLista();
         pedirPermisoNotificaciones();
 
@@ -205,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
                     return true;
                 }
             });
+
         return true;
     }
 

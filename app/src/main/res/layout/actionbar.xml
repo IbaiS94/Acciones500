@@ -5,8 +5,8 @@
     android:id="@+id/bottom_toolbar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:background="@color/design_default_color_background"
-    android:elevation="8dp"
+    android:background="@color/material_dynamic_neutral40"
+    android:elevation="0dp"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
     app:titleTextColor="@android:color/white">
 </androidx.appcompat.widget.Toolbar>

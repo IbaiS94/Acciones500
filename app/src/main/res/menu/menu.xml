@@ -22,9 +22,4 @@
         android:title="Tema"
         app:showAsAction="always"/>
 
-    <item
-        android:id="@+id/action_settings"
-        android:icon="@drawable/favorite"
-        android:title="Configuración"
-        app:showAsAction="never"/>
 </menu>
