@@ -156,12 +156,12 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
             recyclerView.setAdapter(adapt);}
 
 
-        if (cursor.moveToFirst()) {
+        /*       if (cursor.moveToFirst()) {
             Integer nombre = cursor.getCount();
             Toast.makeText(this, String.valueOf(nombre), Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "No hay datos", Toast.LENGTH_SHORT).show();
-        }
+        } */
         cursor.close();
     }
     @Override
