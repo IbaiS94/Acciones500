@@ -29,12 +29,11 @@
                 android:layout_marginBottom="8dp">
 
                 <TextView
-                    android:id="@+id/stockName"
+                    android:id="@+id/stockNom"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:text="Seleccione una acción"
-                    android:textColor="#000"
+                    android:text="@string/stock_nom"
                     android:textSize="28sp"
                     android:fontFamily="sans-serif-medium"/>
             </androidx.cardview.widget.CardView>
@@ -47,12 +46,11 @@
                 android:layout_marginBottom="8dp">
 
                 <TextView
-                    android:id="@+id/stockDescription"
+                    android:id="@+id/stockDescrip"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
                     android:text=""
-                    android:textColor="#666"
                     android:textSize="20sp"/>
             </androidx.cardview.widget.CardView>
 
@@ -61,11 +59,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 app:cardCornerRadius="8dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@color/material_dynamic_neutral95">
+                app:cardElevation="4dp">
 
                 <TextView
-                    android:id="@+id/stockPrice"
+                    android:id="@+id/stockPrecio"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
@@ -87,12 +84,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="140dp"
                     android:padding="16dp"
-                    android:text="Por favor seleccione una acción para ver su información."
-                    android:textColor="#666"
+                    android:text="@string/notas"
                     android:textSize="24sp" />
 
                 <ImageButton
-                    android:id="@+id/imageButton"
+                    android:id="@+id/bot"
                     android:layout_width="43dp"
                     android:layout_height="36dp"
                     android:layout_marginTop="140dp"
@@ -111,8 +107,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:text="Relacionado: "
-                    android:textColor="#666"
+                    android:text="@string/relacionado"
                     android:textSize="20sp" />
             </androidx.cardview.widget.CardView>
 
@@ -121,16 +116,16 @@
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp"
+                android:layout_marginBottom="8dp"
                 app:cardBackgroundColor="#7317A9FA"
-                android:layout_marginBottom="8dp">
+                >
 
                 <TextView
                     android:id="@+id/tradingView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:text="Ver en TradingView"
-                    android:textColor="#156"
+                    android:text="@string/tradingview"
                     android:textSize="20sp" />
             </androidx.cardview.widget.CardView>
 

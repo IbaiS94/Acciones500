@@ -62,17 +62,17 @@ public class FragmentNuevo extends Fragment {
             String nombreC = cursor.getString(1);
             if ((nombre != null && nombre.equals(nombreC)) ||
                     (nombreI != null && nombreI.equals(nombreC))) {
-                TextView nameTextView = view.findViewById(R.id.stockName);
+                TextView nameTextView = view.findViewById(R.id.stockNom);
                 nombre = nombreC;
                 if (listener != null) {
                     listener.onNombreActualizado(nombre);
                 }
                 nameTextView.setText(nombre);
 
-                TextView descTextView = view.findViewById(R.id.stockDescription);
+                TextView descTextView = view.findViewById(R.id.stockDescrip);
                 descTextView.setText(cursor.getString(2));
 
-                TextView precTextView = view.findViewById(R.id.stockPrice);
+                TextView precTextView = view.findViewById(R.id.stockPrecio);
                 String euro = cursor.getString(3) + "€";
                 precTextView.setText(euro);
 

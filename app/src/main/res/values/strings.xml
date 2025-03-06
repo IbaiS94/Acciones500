@@ -3,5 +3,10 @@
 
     <string name="nav_abrir">Abrir navegación</string>
     <string name="nav_cerar">Cerrar navegación</string>
+    <string name="stock_nom">Seleccione una acción</string>
+    <string name="relacionado">"Relacionado: "</string>
+    <string name="tradingview">"Ver en TradingView"</string>
+    <string name="notas">"Por favor seleccione una acción para ver su información."</string>
+    <string name="creditos">"Desarrollado por Ibai Sologuesto para la asignatura de Desarrollo Avanzado del Software"</string>
 
 </resources>

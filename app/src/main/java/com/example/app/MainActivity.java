@@ -91,25 +91,26 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
         Toolbar toolbar = findViewById(R.id.bottom_toolbar);
         setSupportActionBar(toolbar);
 
-        drawer = findViewById(R.id.drawer_layout);
-        toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
-                R.string.nav_abrir, R.string.nav_cerar);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+        drawer = findViewById(R.id.dr);
+        if (drawer != null) {
+            toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.nav_abrir, R.string.nav_cerar);
+            drawer.addDrawerListener(toggle);
+            toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.navigation_view);
+            NavigationView navigationView = findViewById(R.id.navigation_view);
 
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                if (id == R.id.nav_1) {
-                } else if (id == R.id.nav_2) {
+            navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    int id = item.getItemId();
+                    if (id == R.id.nav_1) {
+                    } else if (id == R.id.nav_2) {
+                    }
+                    drawer.closeDrawer(GravityCompat.START);
+                    return true;
                 }
-                drawer.closeDrawer(GravityCompat.START);
-                return true;
-            }
-        });
+            });
+        }
         logicaLista();
         pedirPermisoNotificaciones();
 

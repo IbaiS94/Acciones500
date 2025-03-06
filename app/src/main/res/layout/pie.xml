@@ -12,7 +12,7 @@
         android:id="@+id/textViewFooterCredits"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Desarrollado por Ibai Sologuesto para la asignatura de Desarrollo Avanzado del Software"
+        android:text="@string/creditos"
         android:textColor="@android:color/white"
         android:textSize="14sp"
         android:gravity="center" />

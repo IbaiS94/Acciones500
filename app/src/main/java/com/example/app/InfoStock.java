@@ -16,12 +16,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.material.navigation.NavigationView;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,6 +40,9 @@ public class InfoStock extends AppCompatActivity {
     String nombre = "Error";
     private EditText notasEditText;
     private String FILE_NAME;
+
+    private DrawerLayout drawer;
+    private ActionBarDrawerToggle toggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +58,28 @@ public class InfoStock extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         gestionInfo(null, null);
+
+
+        drawer = findViewById(R.id.dr);
+        if (drawer != null) {
+            toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.nav_abrir, R.string.nav_cerar);
+            drawer.addDrawerListener(toggle);
+            toggle.syncState();
+
+            NavigationView navigationView = findViewById(R.id.navigation_view);
+
+            navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    int id = item.getItemId();
+                    if (id == R.id.nav_1) {
+                    } else if (id == R.id.nav_2) {
+                    }
+                    drawer.closeDrawer(GravityCompat.START);
+                    return true;
+                }
+            });
+        }
     }
 
     public void gestionInfo(String nombre, StockDB db2){
@@ -74,14 +105,14 @@ public class InfoStock extends AppCompatActivity {
         while (cursor.moveToNext()) {
             String nombreC = cursor.getString(1);
             if ((nombre != null && nombre.equals(nombreC)) || (nombreI != null && nombreI.equals(nombreC)))  {
-                TextView name = findViewById(R.id.stockName);
+                TextView name = findViewById(R.id.stockNom);
                 nombre = cursor.getString(1);
                 name.setText(nombre);
                 ///
-                TextView desc = findViewById(R.id.stockDescription);
+                TextView desc = findViewById(R.id.stockDescrip);
                 desc.setText(cursor.getString(2));
                 ///
-                TextView prec = findViewById(R.id.stockPrice);
+                TextView prec = findViewById(R.id.stockPrecio);
                 String euro = cursor.getString(3) + "€";
                 prec.setText(euro);
                 ///
