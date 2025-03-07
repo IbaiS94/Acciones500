@@ -8,5 +8,13 @@
     <string name="tradingview">"Ver en TradingView"</string>
     <string name="notas">"Por favor seleccione una acción para ver su información."</string>
     <string name="creditos">"Desarrollado por Ibai Sologuestoa para la asignatura de Desarrollo Avanzado del Software"</string>
-
+    <string name="recordatorio">"¡Recordatorio!"</string>
+    <string name="agradecimiento">"Gracias por usar la aplicación, si la estas disfrutando una reseña nos ayudaria mucho"</string>
+    <string name="accnot">"Acciones noticias"</string>
+    <string name="acc">"Accion "</string>
+    <string name="conf">"Confirmar"</string>
+    <string name="conf2">"¿Está seguro de realizar el cambio de idioma? Esto necesitara conectividad a internet"</string>
+    <string name="conf3">"¿Esta seguro de realizar el cambio sobre sus favoritos?"</string>
+    <string name="si">"Sí"</string>
+    <string name="no">"No</string>
 </resources>

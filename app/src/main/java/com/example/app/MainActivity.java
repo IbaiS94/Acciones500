@@ -1,4 +1,5 @@
 package com.example.app;
+import android.app.AlertDialog;
 import android.app.SearchManager;
 
 import static java.lang.Boolean.FALSE;
@@ -7,10 +8,12 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -37,11 +40,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.common.util.Strings;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnNombreActualizadoListener {
@@ -58,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        aplicarIdioma();
         setContentView(R.layout.activity_main);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -91,19 +97,27 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     int id = item.getItemId();
-                    if (id == R.id.nav_1) {
-                        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-                        SharedPreferences.Editor editor = preferences.edit();
-                        editor.putString("Idioma","es");
-                    } else if (id == R.id.nav_2) {
-                        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-                        SharedPreferences.Editor editor = preferences.edit();
-                        editor.putString("Idioma","en");
-                    } else if (id == R.id.nav_3) {
-                        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-                        SharedPreferences.Editor editor = preferences.edit();
-                        editor.putString("Idioma","de");
-                    }
+
+                    new MaterialAlertDialogBuilder(MainActivity.this)
+                            .setTitle(getString(R.string.conf))
+                            .setMessage(getString(R.string.conf2))
+                            .setPositiveButton("Ok", (dialog, which) -> {
+                                SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                                SharedPreferences.Editor editor = preferences.edit();
+
+                                if (id == R.id.nav_1) {
+                                    editor.putString("Idioma", "es");
+                                } else if (id == R.id.nav_2) {
+                                    editor.putString("Idioma", "en");
+                                } else if (id == R.id.nav_3) {
+                                    editor.putString("Idioma", "de");
+                                }
+
+                                editor.apply();
+                                aplicarIdioma();
+                            })
+                            .show(); // Mostrar el diálogo
+
                     drawer.closeDrawer(GravityCompat.START);
                     return true;
                 }
@@ -214,9 +228,9 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-                    String busqueda = "Acciones noticias";
+                    String busqueda = getString(R.string.accnot);
                     if(!nombre.equals("")){
-                    busqueda = "Acción "+nombre;}
+                    busqueda = getString(R.string.acc)+nombre;}
                     intent.putExtra(SearchManager.QUERY, busqueda);
                     startActivity(intent);
                     return true;
@@ -237,7 +251,34 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
         return true;
     }
 
+    private void aplicarIdioma() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String nuevoIdioma = prefs.getString("Idioma", "es");
+        String idiomaActual = Locale.getDefault().getLanguage();
 
+        if (nuevoIdioma.equals(idiomaActual)) {
+            return;
+        }
+
+        Locale locale = new Locale(nuevoIdioma);
+        Locale.setDefault(locale);
+
+        Resources res = getResources();
+        Configuration config = res.getConfiguration();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale);
+            config.setLayoutDirection(locale);
+        } else {
+            config.locale = locale;
+        }
+
+        res.updateConfiguration(config, res.getDisplayMetrics());
+
+        if (!isFinishing()) {
+            recreate();
+        }
+    }
 
 
     public void pedirPermisoNotificaciones() {
@@ -266,8 +307,8 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
             );
 
             elBuilder.setSmallIcon(android.R.drawable.stat_sys_warning)
-                    .setContentTitle("¡Recordatorio!")
-                    .setContentText("Gracias por usar la aplicación, si la estas disfrutando una reseña nos ayudaria mucho")
+                    .setContentTitle(getString(R.string.recordatorio))
+                    .setContentText(getString(R.string.agradecimiento))
                     .setVibrate(new long[]{0, 1000, 500, 2000})
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent);

@@ -18,6 +18,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import java.util.List;
 
 public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> {
@@ -77,10 +79,10 @@ public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> 
                 @Override
                 public void onClick(View v) {
                     Log.d("Debug", String.valueOf(favBot));
-                    new AlertDialog.Builder(itemView.getContext())
-                            .setTitle("Confirmar")
-                            .setMessage("¿Esta seguro de realizar el cambio sobre sus favoritos?")
-                            .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                    new MaterialAlertDialogBuilder(itemView.getContext())
+                            .setTitle(R.string.conf)
+                            .setMessage(R.string.conf3)
+                            .setPositiveButton(R.string.si, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     if (!"fav".equals(favBot.getTag())) {
                                         favBot.setImageResource(R.drawable.star2);
@@ -97,11 +99,12 @@ public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> 
                                     }
                                 }
                             })
-                            .setNegativeButton("No", null)
+                            .setNegativeButton(R.string.no, null)
                             .show();
                 }
             });
         }
+
 
         @Override
         public void onClick(View v) {
