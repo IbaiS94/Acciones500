@@ -9,10 +9,9 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -28,13 +27,18 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.mlkit.common.model.DownloadConditions;
+import com.google.mlkit.nl.translate.TranslateLanguage;
+import com.google.mlkit.nl.translate.Translation;
+import com.google.mlkit.nl.translate.Translator;
+import com.google.mlkit.nl.translate.TranslatorOptions;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class InfoStock extends AppCompatActivity {
     String nombre = "Error";
@@ -43,6 +47,9 @@ public class InfoStock extends AppCompatActivity {
 
     private DrawerLayout drawer;
     private ActionBarDrawerToggle toggle;
+
+    private Translator traductor;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +88,11 @@ public class InfoStock extends AppCompatActivity {
             });
         }
     }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        traductor.close(); // Segun api, es lo recomendado
+    }
 
     public void gestionInfo(String nombre, StockDB db2){
         StockDB db;
@@ -104,13 +116,37 @@ public class InfoStock extends AppCompatActivity {
         ////
         while (cursor.moveToNext()) {
             String nombreC = cursor.getString(1);
-            if ((nombre != null && nombre.equals(nombreC)) || (nombreI != null && nombreI.equals(nombreC)))  {
+            if ((nombre != null && nombre.equals(nombreC)) || (nombreI != null && nombreI.equals(nombreC))) {
                 TextView name = findViewById(R.id.stockNom);
                 nombre = cursor.getString(1);
                 name.setText(nombre);
                 ///
                 TextView desc = findViewById(R.id.stockDescrip);
-                desc.setText(cursor.getString(2));
+                TranslatorOptions options = new TranslatorOptions.Builder()
+                        .setSourceLanguage(TranslateLanguage.SPANISH)
+                        .setTargetLanguage(TranslateLanguage.ENGLISH)
+                        .build();
+                traductor = Translation.getClient(options);
+
+                DownloadConditions conditions = new DownloadConditions.Builder()
+                        .build();
+                String txt = cursor.getString(2);
+                traductor.downloadModelIfNeeded(conditions)
+                        .addOnSuccessListener(unused -> {
+                            traductor.translate(txt)
+                                    .addOnSuccessListener(texto_traducido -> {
+                                        Log.d("Traductor", txt);
+                                        desc.setText(texto_traducido);
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.e("Traductor", "Error al traducir: " + e.getMessage());
+                                        desc.setText(txt);
+                                    });
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("Traductor", "Error al descargar el modelo: " + e.getMessage());
+                            desc.setText(txt);
+                        });
                 ///
                 TextView prec = findViewById(R.id.stockPrecio);
                 String euro = cursor.getString(3) + "€";

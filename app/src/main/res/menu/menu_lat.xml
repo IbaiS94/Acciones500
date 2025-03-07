@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:title="IDIOMAS"
+        android:enabled="false"
+        android:titleTextAppearance="?android:attr/textAppearanceLarge"
+        android:icon="@android:drawable/ic_dialog_info" />
+
+    <item
         android:id="@+id/nav_1"
-        android:title="Español" />
+        android:title="🇪🇸 Español"
+        />
+
     <item
         android:id="@+id/nav_2"
-        android:title="Inglés" />
+        android:title="🇬🇧 English"
+        />
+
+    <item
+        android:id="@+id/nav_3"
+        android:title="🇩🇪 Deutsch"
+        />
 </menu>

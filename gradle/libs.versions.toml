@@ -9,6 +9,7 @@ activity = "1.10.0"
 constraintlayout = "2.2.0"
 compiler = "3.2.0-alpha11"
 preference = "1.2.1"
+translate = "17.0.3"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -20,6 +21,7 @@ activity = { group = "androidx.activity", name = "activity", version.ref = "acti
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 compiler = { group = "androidx.databinding", name = "compiler", version.ref = "compiler" }
 preference = { module = "androidx.preference:preference", version.ref = "preference" }
+translate = { module = "com.google.mlkit:translate", version.ref = "translate" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -50,10 +50,10 @@ public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> 
         stockDB.close();
 
         if (esFavorito) {
-            holder.favBot.setImageResource(android.R.drawable.btn_star_big_on);
+            holder.favBot.setImageResource(R.drawable.star2);
             holder.favBot.setTag("fav");
         } else {
-            holder.favBot.setImageResource(android.R.drawable.btn_star_big_off);
+            holder.favBot.setImageResource(R.drawable.star);
             holder.favBot.setTag("fav_no");
         }
     }
@@ -83,13 +83,13 @@ public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> 
                             .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     if (!"fav".equals(favBot.getTag())) {
-                                        favBot.setImageResource(android.R.drawable.btn_star_big_on);
+                                        favBot.setImageResource(R.drawable.star2);
                                         favBot.setTag("fav");
                                         StockDB t = new StockDB(itemView.getContext());
                                         SQLiteDatabase db = t.getWritableDatabase();
                                         t.actualizar(db, listaItems.get(getAdapterPosition()), Boolean.TRUE);
                                     } else {
-                                        favBot.setImageResource(android.R.drawable.btn_star_big_off);
+                                        favBot.setImageResource(R.drawable.favorite);
                                         favBot.setTag("fav_no");
                                         StockDB t = new StockDB(itemView.getContext());
                                         SQLiteDatabase db = t.getWritableDatabase();

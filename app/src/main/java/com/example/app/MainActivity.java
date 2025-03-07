@@ -1,12 +1,8 @@
 package com.example.app;
 import android.app.SearchManager;
 
-import static androidx.core.content.ContextCompat.checkSelfPermission;
-
 import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 
-import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,18 +12,12 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.BoringLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.Toast;
 import android.Manifest;
 
 import androidx.activity.EdgeToEdge;
@@ -42,10 +32,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentOnAttachListener;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -104,7 +92,17 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     int id = item.getItemId();
                     if (id == R.id.nav_1) {
+                        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putString("Idioma","es");
                     } else if (id == R.id.nav_2) {
+                        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putString("Idioma","en");
+                    } else if (id == R.id.nav_3) {
+                        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putString("Idioma","de");
                     }
                     drawer.closeDrawer(GravityCompat.START);
                     return true;
@@ -115,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
         pedirPermisoNotificaciones();
 
         noti();
-        restoreTheme();
+        restaurarTema();
 
     }
     @Override
@@ -177,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
         }
     }
 
-    private void restoreTheme() {
+    private void restaurarTema() {
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         boolean isDarkMode = preferences.getBoolean(THEME_KEY, false); // false es el valor por defecto
 

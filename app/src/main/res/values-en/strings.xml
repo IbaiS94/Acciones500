@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Acciones500</string>
+    <string name="nav_abrir">Open navigation</string>
+    <string name="nav_cerar">Close navigation</string>
+    <string name="stock_nom">Select an action</string>
+    <string name="relacionado">Related:</string>
+    <string name="tradingview">Open TradingView</string>
+    <string name="notas">Please select a stock</string>
+    <string name="creditos">Developed by Ibai Sologuestoa for the advanced software development course</string>
+</resources>
