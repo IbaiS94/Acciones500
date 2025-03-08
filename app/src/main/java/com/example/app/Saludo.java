@@ -1,12 +1,17 @@
 package com.example.app;
 
+import static com.example.app.MainActivity.PREFS_NAME;
+
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+
+import java.util.Locale;
 
 
 public class Saludo extends AppCompatActivity {
@@ -31,6 +38,7 @@ public class Saludo extends AppCompatActivity {
                 finish();
             }
         });
+        aplicarIdioma();
         pedirPermisoNotificaciones();
         noti();
     }
@@ -73,5 +81,33 @@ public class Saludo extends AppCompatActivity {
             elManager.notify(1, elBuilder.build());
         }
 
+    }
+    private void aplicarIdioma() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String nuevoIdioma = prefs.getString("Idioma", "es");
+        String idiomaActual = Locale.getDefault().getLanguage();
+
+        if (nuevoIdioma.equals(idiomaActual)) {
+            return;
+        }
+
+        Locale locale = new Locale(nuevoIdioma);
+        Locale.setDefault(locale);
+
+        Resources res = getResources();
+        Configuration config = res.getConfiguration();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale);
+            config.setLayoutDirection(locale);
+        } else {
+            config.locale = locale;
+        }
+
+        res.updateConfiguration(config, res.getDisplayMetrics());
+
+        if (!isFinishing()) {
+            recreate();
+        }
     }
 }

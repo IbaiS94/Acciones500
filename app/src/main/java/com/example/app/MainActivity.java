@@ -56,14 +56,13 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
 
     private String nombre = "";
 
-    private DrawerLayout drawer;
-    private ActionBarDrawerToggle toggle;
+    private DrawerLayout dr;
+    private ActionBarDrawerToggle tg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        aplicarIdioma();
         setContentView(R.layout.activity_main);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -85,11 +84,11 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
         Toolbar toolbar = findViewById(R.id.bottom_toolbar);
         setSupportActionBar(toolbar);
 
-        drawer = findViewById(R.id.dr);
-        if (drawer != null) {
-            toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.nav_abrir, R.string.nav_cerar);
-            drawer.addDrawerListener(toggle);
-            toggle.syncState();
+        dr = findViewById(R.id.dr);
+        if (dr != null) {
+            tg = new ActionBarDrawerToggle(this, dr, toolbar, R.string.nav_abrir, R.string.nav_cerar);
+            dr.addDrawerListener(tg);
+            tg.syncState();
 
             NavigationView navigationView = findViewById(R.id.navigation_view);
 
@@ -118,13 +117,14 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
                             })
                             .show();
 
-                    drawer.closeDrawer(GravityCompat.START);
+                    dr.closeDrawer(GravityCompat.START);
                     return true;
                 }
             });
         }
         logicaLista();
         restaurarTema();
+        aplicarIdioma();
 
     }
     @Override

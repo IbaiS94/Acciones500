@@ -6,8 +6,11 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -26,6 +29,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 import com.google.mlkit.common.model.DownloadConditions;
 import com.google.mlkit.nl.translate.TranslateLanguage;
@@ -38,6 +42,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class InfoStock extends AppCompatActivity {
@@ -45,8 +50,8 @@ public class InfoStock extends AppCompatActivity {
     private EditText notasEditText;
     private String FILE_NAME;
 
-    private DrawerLayout drawer;
-    private ActionBarDrawerToggle toggle;
+    private DrawerLayout dr;
+    private ActionBarDrawerToggle tg;
 
     private Translator traductor;
 
@@ -67,11 +72,11 @@ public class InfoStock extends AppCompatActivity {
         gestionInfo( null);
 
 
-        drawer = findViewById(R.id.dr);
-        if (drawer != null) {
-            toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.nav_abrir, R.string.nav_cerar);
-            drawer.addDrawerListener(toggle);
-            toggle.syncState();
+        dr = findViewById(R.id.dr);
+        if (dr != null) {
+            tg = new ActionBarDrawerToggle(this, dr, toolbar, R.string.nav_abrir, R.string.nav_cerar);
+            dr.addDrawerListener(tg);
+            tg.syncState();
 
             NavigationView navigationView = findViewById(R.id.navigation_view);
 
@@ -79,10 +84,28 @@ public class InfoStock extends AppCompatActivity {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     int id = item.getItemId();
-                    if (id == R.id.nav_1) {
-                    } else if (id == R.id.nav_2) {
-                    }
-                    drawer.closeDrawer(GravityCompat.START);
+
+                    new MaterialAlertDialogBuilder(InfoStock.this)
+                            .setTitle(getString(R.string.conf))
+                            .setMessage(getString(R.string.conf2))
+                            .setPositiveButton("Ok", (dialog, which) -> {
+                                SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                                SharedPreferences.Editor editor = preferences.edit();
+
+                                if (id == R.id.nav_1) {
+                                    editor.putString("Idioma", "es");
+                                } else if (id == R.id.nav_2) {
+                                    editor.putString("Idioma", "en");
+                                } else if (id == R.id.nav_3) {
+                                    editor.putString("Idioma", "de");
+                                }
+
+                                editor.apply();
+                                aplicarIdioma();
+                            })
+                            .show();
+
+                    dr.closeDrawer(GravityCompat.START);
                     return true;
                 }
             });
@@ -183,7 +206,7 @@ public class InfoStock extends AppCompatActivity {
                 nota.setText(cursor.getString(4));
                 ///
                 TextView sim = findViewById(R.id.stockSimilar);
-                sim.setText(cursor.getString(5));
+                sim.setText(getString(R.string.relacionado)+" "+cursor.getString(5));
             }
         }
         /////
@@ -277,6 +300,34 @@ public class InfoStock extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         guardarNotas();
+    }
+    private void aplicarIdioma() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String nuevoIdioma = prefs.getString("Idioma", "es");
+        String idiomaActual = Locale.getDefault().getLanguage();
+
+        if (nuevoIdioma.equals(idiomaActual)) {
+            return;
+        }
+
+        Locale locale = new Locale(nuevoIdioma);
+        Locale.setDefault(locale);
+
+        Resources res = getResources();
+        Configuration config = res.getConfiguration();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale);
+            config.setLayoutDirection(locale);
+        } else {
+            config.locale = locale;
+        }
+
+        res.updateConfiguration(config, res.getDisplayMetrics());
+
+        if (!isFinishing()) {
+            recreate();
+        }
     }
 }
 

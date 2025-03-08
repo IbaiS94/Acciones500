@@ -1,5 +1,13 @@
 package com.example.app;
+import static com.example.app.MainActivity.PREFS_NAME;
+import com.google.mlkit.common.model.DownloadConditions;
+import com.google.mlkit.nl.translate.TranslateLanguage;
+import com.google.mlkit.nl.translate.Translation;
+import com.google.mlkit.nl.translate.Translator;
+import com.google.mlkit.nl.translate.TranslatorOptions;
 
+import android.content.SharedPreferences;
+import android.util.Log;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -27,6 +35,7 @@ public class FragmentNuevo extends Fragment {
     public String nombre = "Error";
     private EditText notasEditText;
     private String FILE_NAME;
+    private Translator traductor;
 
     @Nullable
     @Override
@@ -44,10 +53,10 @@ public class FragmentNuevo extends Fragment {
         String nombreArg = null;
         if (args != null) {
             nombreArg = args.getString("nombre");
-            Log.d("Args", "Recibido: " + nombreArg);
+            Log.d("FragmentNuevo", "Nombre recibido: " + nombreArg);
         }
 
-        StockDB db = new StockDB(getContext());
+        StockDB db = new StockDB(requireContext());
         Cursor cursor = db.obtenerDescripcion();
 
         String nombreI = null;
@@ -62,6 +71,7 @@ public class FragmentNuevo extends Fragment {
             String nombreC = cursor.getString(1);
             if ((nombre != null && nombre.equals(nombreC)) ||
                     (nombreI != null && nombreI.equals(nombreC))) {
+
                 TextView nameTextView = view.findViewById(R.id.stockNom);
                 nombre = nombreC;
                 if (listener != null) {
@@ -70,7 +80,56 @@ public class FragmentNuevo extends Fragment {
                 nameTextView.setText(nombre);
 
                 TextView descTextView = view.findViewById(R.id.stockDescrip);
-                descTextView.setText(cursor.getString(2));
+                String txt = cursor.getString(2);
+
+                SharedPreferences prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+                String idioma = prefs.getString("Idioma", "es");
+
+                TranslatorOptions options;
+                switch (idioma) {
+                    case "en":
+                        options = new TranslatorOptions.Builder()
+                                .setSourceLanguage(TranslateLanguage.SPANISH)
+                                .setTargetLanguage(TranslateLanguage.ENGLISH)
+                                .build();
+                        break;
+                    case "de":
+                        options = new TranslatorOptions.Builder()
+                                .setSourceLanguage(TranslateLanguage.SPANISH)
+                                .setTargetLanguage(TranslateLanguage.GERMAN)
+                                .build();
+                        break;
+                    default:
+                        descTextView.setText(txt);
+                        options = new TranslatorOptions.Builder()
+                                .setSourceLanguage(TranslateLanguage.SPANISH)
+                                .setTargetLanguage(TranslateLanguage.SPANISH)
+                                .build();
+                        break;
+                }
+
+                    traductor = Translation.getClient(options);
+                    DownloadConditions conditions = new DownloadConditions.Builder().build();
+
+                    traductor.downloadModelIfNeeded(conditions)
+                            .addOnSuccessListener(unused ->
+                                    traductor.translate(txt)
+                                            .addOnSuccessListener(translatedText -> {
+                                                if (isAdded()) { // Verificar que el fragment está adjunto
+                                                    descTextView.setText(translatedText);
+                                                    Log.d("FragmentTraducción", "Traducción exitosa");
+                                                }
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                Log.e("FragmentTraducción", "Error traducción: " + e.getMessage());
+                                                if (isAdded()) descTextView.setText(txt);
+                                            })
+                            )
+                            .addOnFailureListener(e -> {
+                                Log.e("FragmentTraducción", "Error modelo: " + e.getMessage());
+                                if (isAdded()) descTextView.setText(txt);
+                            });
+
 
                 TextView precTextView = view.findViewById(R.id.stockPrecio);
                 String euro = cursor.getString(3) + "€";
@@ -80,7 +139,7 @@ public class FragmentNuevo extends Fragment {
                 notaTextView.setText(cursor.getString(4));
 
                 TextView simTextView = view.findViewById(R.id.stockSimilar);
-                simTextView.setText(cursor.getString(5));
+                simTextView.setText(getString(R.string.relacionado)+" "+cursor.getString(5));
             }
         }
         cursor.close();
@@ -90,18 +149,19 @@ public class FragmentNuevo extends Fragment {
         if (notasGuardadas != null) {
             notasEditText.setText(notasGuardadas);
         }
+
         TextView tradingView = view.findViewById(R.id.tradingView);
-        tradingView.setClickable(Boolean.TRUE);
+        tradingView.setClickable(true);
         tradingView.setOnClickListener(b -> {
             if (getActivity() != null) {
-                Intent launchIntent = getActivity().getPackageManager()
+                Intent launchIntent = requireActivity().getPackageManager()
                         .getLaunchIntentForPackage("com.tradingview.tradingviewapp");
                 if (launchIntent != null) {
-                    getActivity().startActivity(launchIntent);
+                    startActivity(launchIntent);
                 } else {
                     Intent playStoreIntent = new Intent(Intent.ACTION_VIEW,
                             Uri.parse("market://details?id=com.tradingview.tradingviewapp"));
-                    getActivity().startActivity(playStoreIntent);
+                    startActivity(playStoreIntent);
                 }
             }
         });
