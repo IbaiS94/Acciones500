@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Acciones500</string>
+    <string name="nav_abrir">Navigation öffnen</string>
+    <string name="nav_cerar">Navigation schließen</string>
+    <string name="stock_nom">Aktion auswählen</string>
+    <string name="relacionado">Verwandt:</string>
+    <string name="tradingview">TradingView öffnen</string>
+    <string name="notas">Bitte wählen Sie eine Aktie aus</string>
+    <string name="creditos">Entwickelt von Ibai Sologuestoa für den Fortgeschrittenen-Softwareentwicklungskurs</string>
+    <string name="recordatorio">Erinnerung!</string>
+    <string name="agradecimiento">Danke, dass Sie meine App nutzen. Eine positive Bewertung wäre willkommen</string>
+    <string name="accnot">Aktien-Nachrichten</string>
+    <string name="acc">Aktie</string>
+    <string name="conf">Bestätigen</string>
+    <string name="conf2">Sind Sie sicher, dass Sie die App-Sprache ändern möchten? Beachten Sie, dass dies eine Internetverbindung erfordert</string>
+    <string name="conf3">Sie sind dabei, Ihre Favoriten zu ändern. Sind Sie sicher?</string>
+    <string name="si">Ja</string>
+    <string name="no">Nein</string>
+    <string name="a">Danke, dass Sie meine App ausprobieren</string>
+    <string name="pulsa">Drücken Sie auf den Bildschirm, um fortzufahren ☝️</string>
+    <string name="idim">🌍 SPRACHEN 🌍</string>
+</resources>

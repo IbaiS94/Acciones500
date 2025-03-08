@@ -8,4 +8,16 @@
     <string name="tradingview">Open TradingView</string>
     <string name="notas">Please select a stock</string>
     <string name="creditos">Developed by Ibai Sologuestoa for the advanced software development course</string>
+    <string name="recordatorio">¡Reminder!</string>
+    <string name="agradecimiento">Thank you for using my app, a positive review would be appreciated</string>
+    <string name="accnot">Stocks news</string>
+    <string name="acc">Stock</string>
+    <string name="conf">Confirm</string>
+    <string name="conf2">Are you sure about changing the apps language? Be advised that this will require an internet conexion</string>
+    <string name="conf3">You are about to change your favorites, are you sure?</string>
+    <string name="si">Yeah</string>
+    <string name="no">No</string>
+    <string name="a">Thank you for trying my app</string>
+    <string name="pulsa">Press the screen to continue ☝️</string>
+    <string name="idim">🌍 LANGUAGES 🌍</string>
 </resources>

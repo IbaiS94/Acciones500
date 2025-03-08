@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
                                 editor.apply();
                                 aplicarIdioma();
                             })
-                            .show(); // Mostrar el diálogo
+                            .show();
 
                     drawer.closeDrawer(GravityCompat.START);
                     return true;
@@ -124,9 +124,6 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
             });
         }
         logicaLista();
-        pedirPermisoNotificaciones();
-
-        noti();
         restaurarTema();
 
     }
@@ -134,11 +131,6 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
     public void onNombreActualizado(String nombreActualizado) {
         Log.d("NombreActualizado", nombreActualizado);
         nombre = nombreActualizado;
-    }
-    public void infoStockCall(String nombre){
-        InfoStock infoStock = new InfoStock();
-        StockDB db = new StockDB(this);
-        infoStock.gestionInfo(nombre, db);
     }
     public void logicaLista(){
         modfavorito = getIntent().getBooleanExtra("favs", FALSE);
@@ -278,47 +270,6 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
         if (!isFinishing()) {
             recreate();
         }
-    }
-
-
-    public void pedirPermisoNotificaciones() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
-                PackageManager.PERMISSION_GRANTED) {
-            //PEDIR EL PERMISO
-            ActivityCompat.requestPermissions(this, new
-                    String[]{Manifest.permission.POST_NOTIFICATIONS}, 11);
-        }
-    }
-    private void noti(){
-        NotificationManager elManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationCompat.Builder elBuilder = new NotificationCompat.Builder(this, "12");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel elCanal = new NotificationChannel("12", "Ratings",
-                    NotificationManager.IMPORTANCE_DEFAULT);
-
-            elManager.createNotificationChannel(elCanal);
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse("market://details?id=" + getPackageName()));
-            PendingIntent pendingIntent = PendingIntent.getActivity(
-                    this,
-                    0,
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-            );
-
-            elBuilder.setSmallIcon(android.R.drawable.stat_sys_warning)
-                    .setContentTitle(getString(R.string.recordatorio))
-                    .setContentText(getString(R.string.agradecimiento))
-                    .setVibrate(new long[]{0, 1000, 500, 2000})
-                    .setAutoCancel(true)
-                    .setContentIntent(pendingIntent);
-            elCanal.setDescription("Petición de reseña");
-            elCanal.enableLights(true);
-            elCanal.setVibrationPattern(new long[]{0, 1000, 500, 2000});
-            elCanal.enableVibration(true);
-            elManager.notify(1, elBuilder.build());
-        }
-
     }
 
 }

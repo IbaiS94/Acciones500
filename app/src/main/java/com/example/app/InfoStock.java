@@ -41,7 +41,7 @@ import java.io.InputStreamReader;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class InfoStock extends AppCompatActivity {
-    String nombre = "Error";
+    String nombre = null;
     private EditText notasEditText;
     private String FILE_NAME;
 
@@ -64,7 +64,7 @@ public class InfoStock extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.bottom_toolbar);
         setSupportActionBar(toolbar);
 
-        gestionInfo(null, null);
+        gestionInfo( null);
 
 
         drawer = findViewById(R.id.dr);
@@ -91,10 +91,11 @@ public class InfoStock extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        traductor.close(); // Segun api, es lo recomendado
+        if (traductor != null) {
+        traductor.close();} // Segun api, es lo recomendado
     }
 
-    public void gestionInfo(String nombre, StockDB db2){
+    public void gestionInfo(StockDB db2){
         StockDB db;
         if (db2 == null) {
             db = new StockDB(this);
@@ -119,35 +120,61 @@ public class InfoStock extends AppCompatActivity {
             if ((nombre != null && nombre.equals(nombreC)) || (nombreI != null && nombreI.equals(nombreC))) {
                 TextView name = findViewById(R.id.stockNom);
                 nombre = cursor.getString(1);
+                Log.d("Nombre InfoStock", nombre);
                 name.setText(nombre);
                 ///
                 TextView desc = findViewById(R.id.stockDescrip);
-                TranslatorOptions options = new TranslatorOptions.Builder()
-                        .setSourceLanguage(TranslateLanguage.SPANISH)
-                        .setTargetLanguage(TranslateLanguage.ENGLISH)
-                        .build();
-                traductor = Translation.getClient(options);
 
-                DownloadConditions conditions = new DownloadConditions.Builder()
-                        .build();
+                SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                String idioma = prefs.getString("Idioma", "es");
+                TranslatorOptions options;
+                DownloadConditions conditions;
                 String txt = cursor.getString(2);
+
+                switch (idioma) {
+                    case "en":
+                        options = new TranslatorOptions.Builder()
+                                .setSourceLanguage(TranslateLanguage.SPANISH)
+                                .setTargetLanguage(TranslateLanguage.ENGLISH)
+                                .build();
+                        break;
+
+                    case "de":
+                        options = new TranslatorOptions.Builder()
+                                .setSourceLanguage(TranslateLanguage.SPANISH)
+                                .setTargetLanguage(TranslateLanguage.GERMAN)
+                                .build();
+                        break;
+
+                    default:
+                        desc.setText(txt);
+                        options = new TranslatorOptions.Builder()
+                                .setSourceLanguage(TranslateLanguage.SPANISH)
+                                .setTargetLanguage(TranslateLanguage.SPANISH)
+                                .build();
+                        break;
+                }
+
+                traductor = Translation.getClient(options);
+                conditions = new DownloadConditions.Builder().build();
+
                 traductor.downloadModelIfNeeded(conditions)
                         .addOnSuccessListener(unused -> {
                             traductor.translate(txt)
                                     .addOnSuccessListener(texto_traducido -> {
-                                        Log.d("Traductor", txt);
                                         desc.setText(texto_traducido);
+                                        Log.d("Traductor", "Traducción exitosa: " + texto_traducido);
                                     })
                                     .addOnFailureListener(e -> {
-                                        Log.e("Traductor", "Error al traducir: " + e.getMessage());
+                                        Log.e("Traductor", "Error traducción: " + e.getMessage());
                                         desc.setText(txt);
                                     });
                         })
                         .addOnFailureListener(e -> {
-                            Log.e("Traductor", "Error al descargar el modelo: " + e.getMessage());
+                            Log.e("Traductor", "Error modelo: " + e.getMessage());
                             desc.setText(txt);
                         });
-                ///
+
                 TextView prec = findViewById(R.id.stockPrecio);
                 String euro = cursor.getString(3) + "€";
                 prec.setText(euro);
@@ -212,7 +239,8 @@ public class InfoStock extends AppCompatActivity {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     Intent intent2 = new Intent(Intent.ACTION_WEB_SEARCH);
-                    intent2.putExtra(SearchManager.QUERY, "Acciones "+nombre );
+                    Log.d("Nombre 2", nombre);
+                    intent2.putExtra(SearchManager.QUERY, getString(R.string.acc)+" "+nombre );
                     startActivity(intent2);
                     return true;
                 }
@@ -220,7 +248,9 @@ public class InfoStock extends AppCompatActivity {
         return true;
     }
     private void guardarNotas() {
-        String texto = notasEditText.getText().toString();
+        String texto = "";
+        if(notasEditText != null){
+            texto = notasEditText.getText().toString();}
         try (FileOutputStream fos = openFileOutput(FILE_NAME, Context.MODE_PRIVATE)) {
             fos.write(texto.getBytes());
         } catch (IOException e) {

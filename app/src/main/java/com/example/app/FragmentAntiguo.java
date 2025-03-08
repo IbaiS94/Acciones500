@@ -24,7 +24,6 @@ public class FragmentAntiguo extends Fragment {
         MainActivity mainActivity = (MainActivity) getActivity();
         if (mainActivity != null) {
             mainActivity.logicaLista();
-            mainActivity.pedirPermisoNotificaciones();
         }
     }
 }
