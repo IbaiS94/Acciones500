@@ -1,6 +1,6 @@
 package com.example.app;
-import static com.example.app.MainActivity.PREFS_NAME;
-import static com.example.app.MainActivity.THEME_KEY;
+import static com.example.app.MainActivity.PREFS;
+import static com.example.app.MainActivity.TEMA;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class InfoStock extends AppCompatActivity {
     String nombre = null;
     private EditText notasEditText;
-    private String FILE_NAME;
+    private String NOM_ARCHIVO;
 
     private DrawerLayout dr;
     private ActionBarDrawerToggle tg;
@@ -71,7 +71,7 @@ public class InfoStock extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        Toolbar toolbar = findViewById(R.id.bottom_toolbar);
+        Toolbar toolbar = findViewById(R.id.barra_menu);
         setSupportActionBar(toolbar);
 
         gestionInfo( null);
@@ -83,7 +83,7 @@ public class InfoStock extends AppCompatActivity {
             dr.addDrawerListener(tg);
             tg.syncState();
 
-            NavigationView navigationView = findViewById(R.id.navigation_view);
+            NavigationView navigationView = findViewById(R.id.nav);
 
             navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
@@ -94,7 +94,7 @@ public class InfoStock extends AppCompatActivity {
                             .setTitle(getString(R.string.conf))
                             .setMessage(getString(R.string.conf2))
                             .setPositiveButton("Ok", (dialog, which) -> {
-                                SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                                SharedPreferences preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
                                 SharedPreferences.Editor editor = preferences.edit();
 
                                 if (id == R.id.nav_1) {
@@ -136,11 +136,11 @@ public class InfoStock extends AppCompatActivity {
         ////
         String nombreI;
         if(nombre == null){
-        FILE_NAME = getIntent().getStringExtra("nombre").toString()+ ".txt";
+        NOM_ARCHIVO = getIntent().getStringExtra("nombre").toString()+ ".txt";
         nombreI = getIntent().getStringExtra("nombre");
         }
         else{
-        FILE_NAME=nombre+ ".txt";
+        NOM_ARCHIVO=nombre+ ".txt";
         nombreI = null;}
         ////
         while (cursor.moveToNext()) {
@@ -153,7 +153,7 @@ public class InfoStock extends AppCompatActivity {
                 ///
                 TextView desc = findViewById(R.id.stockDescrip);
 
-                SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
                 String idioma = prefs.getString("Idioma", "es");
                 TranslatorOptions options;
                 DownloadConditions conditions;
@@ -243,18 +243,18 @@ public class InfoStock extends AppCompatActivity {
         boton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                int currentMode = AppCompatDelegate.getDefaultNightMode();
-                boolean isDarkMode = currentMode != AppCompatDelegate.MODE_NIGHT_YES;
+                int esteMode = AppCompatDelegate.getDefaultNightMode();
+                boolean esDarkMode = esteMode != AppCompatDelegate.MODE_NIGHT_YES;
 
                 // Guardar la preferencia
-                SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                SharedPreferences preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
                 SharedPreferences.Editor editor = preferences.edit();
-                editor.putBoolean(THEME_KEY, isDarkMode);
+                editor.putBoolean(TEMA, esDarkMode);
                 editor.apply();
 
                 // Aplicar el tema
                 AppCompatDelegate.setDefaultNightMode(
-                        isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
+                        esDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
                 );
 
                 recreate();
@@ -279,7 +279,7 @@ public class InfoStock extends AppCompatActivity {
         String texto = "";
         if(notasEditText != null){
             texto = notasEditText.getText().toString();}
-        try (FileOutputStream fos = openFileOutput(FILE_NAME, Context.MODE_PRIVATE)) {
+        try (FileOutputStream fos = openFileOutput(NOM_ARCHIVO, Context.MODE_PRIVATE)) {
             fos.write(texto.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
@@ -288,7 +288,7 @@ public class InfoStock extends AppCompatActivity {
 
     private String leerNotas() {
         StringBuilder sb = new StringBuilder();
-        try (FileInputStream fis = openFileInput(FILE_NAME);
+        try (FileInputStream fis = openFileInput(NOM_ARCHIVO);
              InputStreamReader isr = new InputStreamReader(fis);
              BufferedReader br = new BufferedReader(isr)) {
             String linea;
@@ -307,7 +307,7 @@ public class InfoStock extends AppCompatActivity {
         guardarNotas();
     }
     private void aplicarIdioma() {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         String nuevoIdioma = prefs.getString("Idioma", "es");
         String idiomaActual = Locale.getDefault().getLanguage();
 
@@ -321,12 +321,8 @@ public class InfoStock extends AppCompatActivity {
         Resources res = getResources();
         Configuration config = res.getConfiguration();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            config.setLocale(locale);
-            config.setLayoutDirection(locale);
-        } else {
-            config.locale = locale;
-        }
+        config.setLocale(locale);
+        config.setLayoutDirection(locale);
 
         res.updateConfiguration(config, res.getDisplayMetrics());
 

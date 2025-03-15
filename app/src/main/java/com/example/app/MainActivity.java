@@ -52,8 +52,8 @@ import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnNombreActualizadoListener {
-    public static final String PREFS_NAME = "ThemePreferences";
-    public static final String THEME_KEY = "isDarkMode";
+    public static final String PREFS = "Prefs";
+    public static final String TEMA = "esDarkMode";
     private boolean modfavorito = false;
 
     private String nombre = "";
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        Toolbar toolbar = findViewById(R.id.bottom_toolbar);
+        Toolbar toolbar = findViewById(R.id.barra_menu);
         setSupportActionBar(toolbar);
 
         dr = findViewById(R.id.dr);
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
             dr.addDrawerListener(tg);
             tg.syncState();
 
-            NavigationView navigationView = findViewById(R.id.navigation_view);
+            NavigationView navigationView = findViewById(R.id.nav);
 
             navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
                             .setTitle(getString(R.string.conf))
                             .setMessage(getString(R.string.conf2))
                             .setPositiveButton("Ok", (dialog, which) -> {
-                                SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                                SharedPreferences preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
                                 SharedPreferences.Editor editor = preferences.edit();
 
                                 if (id == R.id.nav_1) {
@@ -187,11 +187,11 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
     }
 
     private void restaurarTema() {
-        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        boolean isDarkMode = preferences.getBoolean(THEME_KEY, false); // false es el valor por defecto
+        SharedPreferences preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
+        boolean esDarkMode = preferences.getBoolean(TEMA, false); // false es el valor por defecto
 
         AppCompatDelegate.setDefaultNightMode(
-                isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
+                esDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
         );
     }
     @Override
@@ -201,18 +201,18 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
             boton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
-                    int currentMode = AppCompatDelegate.getDefaultNightMode();
-                    boolean isDarkMode = currentMode != AppCompatDelegate.MODE_NIGHT_YES;
+                    int esteMode = AppCompatDelegate.getDefaultNightMode();
+                    boolean esDarkMode = esteMode != AppCompatDelegate.MODE_NIGHT_YES;
 
                     // Guardar la preferencia
-                    SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                    SharedPreferences preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
                     SharedPreferences.Editor editor = preferences.edit();
-                    editor.putBoolean(THEME_KEY, isDarkMode);
+                    editor.putBoolean(TEMA, esDarkMode);
                     editor.apply();
 
                     // Aplicar el tema
                     AppCompatDelegate.setDefaultNightMode(
-                            isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
+                            esDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
                     );
 
                     recreate();
@@ -249,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
     }
 
     private void aplicarIdioma() {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         String nuevoIdioma = prefs.getString("Idioma", "es");
         String idiomaActual = Locale.getDefault().getLanguage();
 
@@ -263,12 +263,8 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
         Resources res = getResources();
         Configuration config = res.getConfiguration();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            config.setLocale(locale);
-            config.setLayoutDirection(locale);
-        } else {
-            config.locale = locale;
-        }
+        config.setLocale(locale);
+        config.setLayoutDirection(locale);
 
         res.updateConfiguration(config, res.getDisplayMetrics());
 

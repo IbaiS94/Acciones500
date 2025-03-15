@@ -1,5 +1,5 @@
 package com.example.app;
-import static com.example.app.MainActivity.PREFS_NAME;
+import static com.example.app.MainActivity.PREFS;
 import com.google.mlkit.common.model.DownloadConditions;
 import com.google.mlkit.nl.translate.TranslateLanguage;
 import com.google.mlkit.nl.translate.Translation;
@@ -34,7 +34,7 @@ public class FragmentNuevo extends Fragment {
 
     public String nombre = "Error";
     private EditText notasEditText;
-    private String FILE_NAME;
+    private String NOM_ARCHIVO;
     private Translator traductor;
 
     @Nullable
@@ -61,10 +61,10 @@ public class FragmentNuevo extends Fragment {
 
         String nombreI = null;
         if (nombreArg != null) {
-            FILE_NAME = nombreArg + ".txt";
+            NOM_ARCHIVO = nombreArg + ".txt";
             nombreI = nombreArg;
         } else {
-            FILE_NAME = nombre + ".txt";
+            NOM_ARCHIVO = nombre + ".txt";
         }
 
         while (cursor.moveToNext()) {
@@ -82,7 +82,7 @@ public class FragmentNuevo extends Fragment {
                 TextView descTextView = view.findViewById(R.id.stockDescrip);
                 String txt = cursor.getString(2);
 
-                SharedPreferences prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+                SharedPreferences prefs = requireContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
                 String idioma = prefs.getString("Idioma", "es");
 
                 TranslatorOptions options;
@@ -187,7 +187,7 @@ public class FragmentNuevo extends Fragment {
         String texto = notasEditText.getText().toString();
         Context context = getContext();
         if (context != null) {
-            try (FileOutputStream fos = context.openFileOutput(FILE_NAME, Context.MODE_PRIVATE)) {
+            try (FileOutputStream fos = context.openFileOutput(NOM_ARCHIVO, Context.MODE_PRIVATE)) {
                 fos.write(texto.getBytes());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -199,7 +199,7 @@ public class FragmentNuevo extends Fragment {
         StringBuilder sb = new StringBuilder();
         Context context = getContext();
         if (context != null) {
-            try (FileInputStream fis = context.openFileInput(FILE_NAME);
+            try (FileInputStream fis = context.openFileInput(NOM_ARCHIVO);
                  InputStreamReader isr = new InputStreamReader(fis);
                  BufferedReader br = new BufferedReader(isr)) {
                 String linea;

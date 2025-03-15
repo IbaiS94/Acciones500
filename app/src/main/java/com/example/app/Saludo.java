@@ -1,6 +1,6 @@
 package com.example.app;
 
-import static com.example.app.MainActivity.PREFS_NAME;
+import static com.example.app.MainActivity.PREFS;
 
 import android.Manifest;
 import android.app.NotificationChannel;
@@ -47,43 +47,44 @@ public class Saludo extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) !=
                 PackageManager.PERMISSION_GRANTED) {
             //PEDIR EL PERMISO
-            ActivityCompat.requestPermissions(this, new
-                    String[]{Manifest.permission.POST_NOTIFICATIONS}, 11);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                ActivityCompat.requestPermissions(this, new
+                        String[]{Manifest.permission.POST_NOTIFICATIONS}, 11);
+            }
+
         }
     }
     private void noti(){
         NotificationManager elManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder elBuilder = new NotificationCompat.Builder(this, "12");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel elCanal = new NotificationChannel("12", "Ratings",
-                    NotificationManager.IMPORTANCE_DEFAULT);
+        NotificationChannel elCanal = new NotificationChannel("12", "Ratings",
+                NotificationManager.IMPORTANCE_DEFAULT);
 
-            elManager.createNotificationChannel(elCanal);
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse("market://details?id=" + getPackageName()));
-            PendingIntent pendingIntent = PendingIntent.getActivity(
-                    this,
-                    0,
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-            );
+        elManager.createNotificationChannel(elCanal);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("market://details?id=" + getPackageName()));
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
 
-            elBuilder.setSmallIcon(android.R.drawable.stat_sys_warning)
-                    .setContentTitle(getString(R.string.recordatorio))
-                    .setContentText(getString(R.string.agradecimiento))
-                    .setVibrate(new long[]{0, 1000, 500, 2000})
-                    .setAutoCancel(true)
-                    .setContentIntent(pendingIntent);
-            elCanal.setDescription("Petición de reseña");
-            elCanal.enableLights(true);
-            elCanal.setVibrationPattern(new long[]{0, 1000, 500, 2000});
-            elCanal.enableVibration(true);
-            elManager.notify(1, elBuilder.build());
-        }
+        elBuilder.setSmallIcon(android.R.drawable.stat_sys_warning)
+                .setContentTitle(getString(R.string.recordatorio))
+                .setContentText(getString(R.string.agradecimiento))
+                .setVibrate(new long[]{0, 1000, 500, 2000})
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent);
+        elCanal.setDescription("Petición de reseña");
+        elCanal.enableLights(true);
+        elCanal.setVibrationPattern(new long[]{0, 1000, 500, 2000});
+        elCanal.enableVibration(true);
+        elManager.notify(1, elBuilder.build());
 
     }
     private void aplicarIdioma() {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         String nuevoIdioma = prefs.getString("Idioma", "es");
         String idiomaActual = Locale.getDefault().getLanguage();
 
@@ -97,12 +98,8 @@ public class Saludo extends AppCompatActivity {
         Resources res = getResources();
         Configuration config = res.getConfiguration();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            config.setLocale(locale);
-            config.setLayoutDirection(locale);
-        } else {
-            config.locale = locale;
-        }
+        config.setLocale(locale);
+        config.setLayoutDirection(locale);
 
         res.updateConfiguration(config, res.getDisplayMetrics());
 
