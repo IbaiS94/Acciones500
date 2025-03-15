@@ -1,4 +1,4 @@
-package com.example.app;
+package com.ibaisologuestoa.acciones500;
 
 import org.junit.Test;
 

@@ -1,6 +1,6 @@
-package com.example.app;
-import static com.example.app.MainActivity.PREFS;
-import static com.example.app.MainActivity.TEMA;
+package com.ibaisologuestoa.acciones500;
+import static com.ibaisologuestoa.acciones500.MainActivity.PREFS;
+import static com.ibaisologuestoa.acciones500.MainActivity.TEMA;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -10,7 +10,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -45,7 +44,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class InfoStock extends AppCompatActivity {
     String nombre = null;

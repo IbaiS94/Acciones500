@@ -1,27 +1,17 @@
-package com.example.app;
-import android.app.AlertDialog;
+package com.ibaisologuestoa.acciones500;
 import android.app.SearchManager;
 
 import static java.lang.Boolean.FALSE;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.Manifest;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -31,9 +21,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
@@ -42,7 +29,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.common.util.Strings;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 
@@ -72,8 +58,8 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container_nuevo, new com.example.app.FragmentNuevo())
-                    .replace(R.id.container_antiguo, new com.example.app.FragmentAntiguo())
+                    .replace(R.id.container_nuevo, new com.ibaisologuestoa.acciones500.FragmentNuevo())
+                    .replace(R.id.container_antiguo, new com.ibaisologuestoa.acciones500.FragmentAntiguo())
                     .commit();
         }
 
@@ -161,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
             }}
 
         if(recyclerView != null){
-            com.example.app.AdaptadorRv adapt = new com.example.app.AdaptadorRv(this, listaDatos);
+            com.ibaisologuestoa.acciones500.AdaptadorRv adapt = new com.ibaisologuestoa.acciones500.AdaptadorRv(this, listaDatos);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             recyclerView.setAdapter(adapt);}
 

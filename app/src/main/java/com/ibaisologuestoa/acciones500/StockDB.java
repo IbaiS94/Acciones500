@@ -1,6 +1,4 @@
-package com.example.app;
-
-import static java.sql.Types.NULL;
+package com.ibaisologuestoa.acciones500;
 
 import android.content.ContentValues;
 import android.content.Context;

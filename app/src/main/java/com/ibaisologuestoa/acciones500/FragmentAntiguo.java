@@ -1,4 +1,4 @@
-package com.example.app;
+package com.ibaisologuestoa.acciones500;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

@@ -1,7 +1,6 @@
-package com.example.app; // Cambia esto por el nombre de tu paquete
+package com.ibaisologuestoa.acciones500; // Cambia esto por el nombre de tu paquete
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;

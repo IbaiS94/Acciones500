@@ -1,6 +1,6 @@
-package com.example.app;
+package com.ibaisologuestoa.acciones500;
 
-import static com.example.app.MainActivity.PREFS;
+import static com.ibaisologuestoa.acciones500.MainActivity.PREFS;
 
 import android.Manifest;
 import android.app.NotificationChannel;
