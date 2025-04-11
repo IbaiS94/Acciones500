@@ -47,66 +47,61 @@ public class Saludo extends AppCompatActivity {
     private SharedPreferences sharedPrefs;
     private RequestQueue requestQueue;
 
-
-    // Actualizar onCreate
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sharedPrefs = getSharedPreferences(USER_PREFS, MODE_PRIVATE);
         requestQueue = Volley.newRequestQueue(this);
         aplicarIdioma();
-        if (!estaLogueado()) {
-            mostrarInterfazAutenticacion();
+        verificarEstadoAutenticacion();
+        gestionarNotificaciones();
+    }
+
+    private void verificarEstadoAutenticacion() {
+        boolean isLoggedIn = sharedPrefs.getBoolean("isLoggedIn", false);
+        boolean isFirstTime = sharedPrefs.getBoolean("firstTime", true);
+
+        if (isFirstTime) {
+            SharedPreferences.Editor editor = sharedPrefs.edit();
+            editor.putBoolean("firstTime", false);
+            editor.putBoolean("isLoggedIn", false);
+            editor.apply();
+            isLoggedIn = false;
+        }
+
+        if (isLoggedIn) {
+            mostrarInterfazLogueado();
         } else {
-            mostrarInterfazPrincipal(); // Redirige inmediatamente
+            mostrarInterfazBienvenida();
         }
     }
-
-    private boolean estaLogueado() {
-        return sharedPrefs.getBoolean("isLoggedIn", false);
-    }
-
-    private void mostrarInterfazAutenticacion() {
+    private void mostrarInterfazBienvenida() {
         setContentView(R.layout.activity_auth);
-
         Button btnLogin = findViewById(R.id.btnLogin);
-        Button btnRegister = findViewById(R.id.btnRegister);
-        TextView tvWelcome = findViewById(R.id.tvWelcome);
-        Button btnContinuar = findViewById(R.id.btnContinuar);
+        Button btnRegister = findViewById(R.id.btnRegistro);
 
-        if (estaLogueado()) {
-            btnLogin.setVisibility(View.GONE);
-            btnRegister.setVisibility(View.GONE);
-            tvWelcome.setVisibility(View.VISIBLE);
-            btnContinuar.setVisibility(View.VISIBLE);
-
-            btnContinuar.setOnClickListener(v -> mostrarInterfazPrincipal());
-        } else {
-            btnLogin.setOnClickListener(v -> mostrarDialogo(R.layout.dialog_login, true));
-            btnRegister.setOnClickListener(v -> mostrarDialogo(R.layout.dialog_registro, false));
-        }
+        btnLogin.setOnClickListener(v -> mostrarDialogo(R.layout.dialog_login, true));
+        btnRegister.setOnClickListener(v -> mostrarDialogo(R.layout.dialog_registro, false));
     }
 
-    private void mostrarInterfazPrincipal() {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+    private void cerrarSesion() {
+        sharedPrefs.edit()
+                .clear()
+                .apply();
+        Intent intent = new Intent(this, Saludo.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();
     }
 
-    private void aplicarConfiguraciones() {
-        aplicarIdioma();
-        gestionarNotificaciones();
-    }
-
     private void mostrarDialogo(int layout, boolean esLogin) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        LayoutInflater inflater = this.getLayoutInflater();
+        LayoutInflater inflater = getLayoutInflater();
         View view = inflater.inflate(layout, null);
         builder.setView(view);
 
         AlertDialog dialog = builder.create();
-
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
@@ -128,19 +123,15 @@ public class Saludo extends AppCompatActivity {
 
     private void configurarLogin(View view, AlertDialog dialog, EditText etEmail, EditText etPass) {
         Button btnLogin = view.findViewById(R.id.btnIniciarSesion);
-
         btnLogin.setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
             String pass = etPass.getText().toString().trim();
-
-            if (validarInputs(email, pass)) {
-                autenticarUsuario(email, pass, dialog);
-            }
+            if (validarInputs(email, pass)) autenticarUsuario(email, pass, dialog);
         });
     }
 
     private void configurarRegistro(View view, AlertDialog dialog, EditText etEmail, EditText etPass) {
-        EditText etNombre = view.findViewById(R.id.etNombre);
+        EditText etNombre = view.findViewById(R.id.campoNombre);
         EditText etConfirmar = view.findViewById(R.id.etConfirmarPassword);
         Button btnRegistro = view.findViewById(R.id.btnCompletarRegistro);
 
@@ -149,10 +140,7 @@ public class Saludo extends AppCompatActivity {
             String email = etEmail.getText().toString().trim();
             String pass = etPass.getText().toString().trim();
             String confirmar = etConfirmar.getText().toString().trim();
-
-            if (validarRegistro(nombre, email, pass, confirmar)) {
-                registrarUsuario(nombre, email, pass, dialog);
-            }
+            if (validarRegistro(nombre, email, pass, confirmar)) registrarUsuario(nombre, email, pass, dialog);
         });
     }
 
@@ -189,7 +177,6 @@ public class Saludo extends AppCompatActivity {
     }
 
     private void autenticarUsuario(String email, String pass, AlertDialog dialog) {
-
         JSONObject params = new JSONObject();
         try {
             params.put("email", email);
@@ -205,30 +192,27 @@ public class Saludo extends AppCompatActivity {
                 response -> {
                     try {
                         if (response.getBoolean("exito")) {
-                            guardarSesion(email);
+                            String nombre = response.getString("nombre");
+                            guardarSesion(email, nombre);
                             dialog.dismiss();
 
                             Intent intent = new Intent(Saludo.this, MainActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
-                            finish();}
-                        else {
+                            finish();
+                        } else {
                             mostrarError(response.getString("mensaje"));
                         }
                     } catch (JSONException e) {
                         mostrarError("Error en respuesta");
                     }
                 },
-                error -> {
-                    mostrarError("Error de conexión");
-                }
+                error -> mostrarError("Error de conexión")
         );
-
         requestQueue.add(request);
     }
 
     private void registrarUsuario(String nombre, String email, String pass, AlertDialog dialog) {
-
         JSONObject params = new JSONObject();
         try {
             params.put("nombre", nombre);
@@ -245,14 +229,13 @@ public class Saludo extends AppCompatActivity {
                 response -> {
                     try {
                         if (response.getBoolean("exito")) {
-                            guardarSesion(email);
+                            guardarSesion(email, nombre);
                             dialog.dismiss();
 
                             Intent intent = new Intent(Saludo.this, MainActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
                             finish();
-
                         } else {
                             mostrarError(response.getString("mensaje"));
                         }
@@ -260,46 +243,61 @@ public class Saludo extends AppCompatActivity {
                         mostrarError("Error en respuesta");
                     }
                 },
-                error -> {
-                    mostrarError("Error de conexión");
-                }
+                error -> mostrarError("Error de conexión")
         );
-
         requestQueue.add(request);
     }
 
-    private void guardarSesion(String email) {
-        sharedPrefs.edit()
-                .putBoolean("isLoggedIn", true)
-                .putString("currentUser", email)
-                .commit();
+    private void mostrarInterfazLogueado() {
+        setContentView(R.layout.saludo_login);
+
+        String nombre = sharedPrefs.getString("currentUserName", "");
+        String email = sharedPrefs.getString("currentUser", "");
+
+        TextView tvSaludo = findViewById(R.id.tvSaludo);
+        TextView tvEmail = findViewById(R.id.tvEmail);
+        Button btnCerrar = findViewById(R.id.btnCerrarSesion);
+
+        tvSaludo.setText(getString(R.string.bienvenido, nombre));
+        tvEmail.setText(getString(R.string.logeado_como, email));
+
+        View rootView = findViewById(R.id.rootLayout);
+        rootView.setOnClickListener(v -> {
+            startActivity(new Intent(Saludo.this, MainActivity.class));
+            finish();
+        });
+        btnCerrar.setOnClickListener(v -> cerrarSesion());
+    }
+
+
+    private void guardarSesion(String email, String nombre) {
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean("isLoggedIn", true);
+        editor.putString("currentUser", email);
+        editor.putString("currentUserName", nombre);
+        editor.putBoolean("firstTime", false);
+        editor.apply();
         aplicarIdioma();
     }
+
 
     private void aplicarIdioma() {
         SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         String nuevoIdioma = prefs.getString("Idioma", "es");
-        String idiomaActual = Locale.getDefault().getLanguage();
-
-        if (nuevoIdioma.equals(idiomaActual)) {
-            return;
-        }
-
-        Locale locale = new Locale(nuevoIdioma);
-        Locale.setDefault(locale);
-
         Resources res = getResources();
         Configuration config = res.getConfiguration();
-        config.setLocale(locale);
-        res.updateConfiguration(config, res.getDisplayMetrics());
-
-        if (!isFinishing()) {
+        if (!nuevoIdioma.equals(config.locale.getLanguage())) {
+            Locale locale = new Locale(nuevoIdioma);
+            Locale.setDefault(locale);
+            config.setLocale(locale);
+            res.updateConfiguration(config, res.getDisplayMetrics());
             recreate();
         }
     }
+
     private void gestionarNotificaciones() {
-        crearCanalNotificaciones();
         pedirPermisoNotificaciones();
+        crearCanalNotificaciones();
         mostrarNotificacion();
     }
 
@@ -311,30 +309,21 @@ public class Saludo extends AppCompatActivity {
                     NotificationManager.IMPORTANCE_DEFAULT
             );
             channel.setDescription("Canal para notificaciones de la app");
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(channel);
+            getSystemService(NotificationManager.class).createNotificationChannel(channel);
         }
     }
 
     private void pedirPermisoNotificaciones() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) !=
-                    PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS},
-                        NOTIFICATION_PERMISSION_CODE);
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, NOTIFICATION_PERMISSION_CODE);
             }
         }
     }
 
     private void mostrarNotificacion() {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
-        PendingIntent pendingIntent = PendingIntent.getActivity(
-                this,
-                0,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.stat_sys_warning)
@@ -344,8 +333,7 @@ public class Saludo extends AppCompatActivity {
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
-        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        manager.notify(1, builder.build());
+        getSystemService(NotificationManager.class).notify(1, builder.build());
     }
 
     private void mostrarError(String mensaje) {
@@ -355,10 +343,8 @@ public class Saludo extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == NOTIFICATION_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                mostrarNotificacion();
-            }
+        if (requestCode == NOTIFICATION_PERMISSION_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            mostrarNotificacion();
         }
     }
 }

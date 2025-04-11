@@ -18,7 +18,7 @@
     <string name="si">"Sí"</string>
     <string name="no">"No</string>
     <string name="a">"¡Gracias por descargar!"</string>
-    <string name="pulsa">"Pulsa para continuar ☝️"</string>
+    <string name="pulsa">"Bienvenido de vuelta, pulsa para continuar ☝️"</string>
     <string name="idim">"🌍 IDIOMAS 🌍"</string>
     <!-- Cadenas para inicio de sesión y registro -->
     <string name="iniciar_sesion">Iniciar Sesión</string>
@@ -35,4 +35,8 @@
     <string name="password_corto">La contraseña debe tener al menos 6 caracteres</string>
     <string name="passwords_no_coinciden">Las contraseñas no coinciden</string>
     <string name="email_ya_registrado">Este correo ya está registrado</string>
+    <string name="bienvenido">¡Bienvenido, %s!</string>
+    <string name="logeado_como">Logeado como: %s</string>
+    <string name="cerrar_sesion">Cerrar Sesión</string>
+    <string name="foto_usuario">Foto de perfil</string>
 </resources>

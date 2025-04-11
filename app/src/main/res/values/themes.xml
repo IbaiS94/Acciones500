@@ -20,8 +20,9 @@
         <!-- Barra de estado -->
         <item name="android:statusBarColor">@color/azul_800</item>
 
-        <!-- Forzar el color de fondo de la ventana -->
+        <!-- Forzar el color de fondo de la lista acciones etc-->
         <item name="android:windowBackground">@color/gris_claro_fondo</item>
+
     </style>
 
     <!-- Estilo personalizado para botones en modo claro -->

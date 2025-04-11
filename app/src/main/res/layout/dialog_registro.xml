@@ -5,13 +5,38 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="24dp"
-    android:background="@drawable/dialog_redondo"> <TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/registrarse"
-    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-    android:gravity="center"
-    android:layout_marginBottom="24dp"/>
+    android:background="@drawable/dialog_redondo">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/registrarse"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+        android:gravity="center"
+        android:layout_marginBottom="24dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:id="@+id/fotoPerfil"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/person2"
+            android:contentDescription="string/foto_de_perfil"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:id="@+id/botonSeleccionarFoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="string/seleccionar_foto"/>
+
+    </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilNombre"
@@ -23,7 +48,7 @@
         android:layout_marginBottom="12dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etNombre"
+            android:id="@+id/campoNombre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPersonName"
@@ -41,7 +66,7 @@
         android:layout_marginBottom="12dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etEmail"
+            android:id="@+id/campoCorreo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress" />
@@ -96,6 +121,7 @@
             android:paddingTop="12dp"
             android:paddingBottom="12dp"
             app:cornerRadius="8dp" />
+
     </RelativeLayout>
 
 </LinearLayout>
