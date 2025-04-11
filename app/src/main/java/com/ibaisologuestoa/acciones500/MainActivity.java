@@ -248,7 +248,6 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
 
         Resources res = getResources();
         Configuration config = res.getConfiguration();
-
         config.setLocale(locale);
         config.setLayoutDirection(locale);
 

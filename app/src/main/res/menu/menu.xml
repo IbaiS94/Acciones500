@@ -7,6 +7,7 @@
         android:title="Favoritos"
         android:icon="@drawable/favorite2"
         app:showAsAction="always"
+        app:iconTint="?attr/colorControlNormal"
         />
 
     <item
@@ -14,12 +15,14 @@
         android:title="Noticias"
         android:icon="@drawable/noticias"
         app:showAsAction="always"
+        app:iconTint="?attr/colorControlNormal"
         />
 
     <item
         android:id="@+id/action_tema"
         android:icon="@drawable/paint"
         android:title="Tema"
-        app:showAsAction="always"/>
+        app:showAsAction="always"
+        app:iconTint="?attr/colorControlNormal"/>
 
 </menu>

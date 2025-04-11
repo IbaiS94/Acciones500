@@ -2,4 +2,21 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="azul_600">#1E88E5</color>
+    <color name="azul_800">#1565C0</color>
+    <color name="gris_azulado_200">#B0BEC5</color>
+    <color name="gris_azulado_700">#455A64</color>
+    <color name="negro">#000000</color>
+    <color name="blanco">#FFFFFF</color>
+
+    <color name="gris_claro_fondo">#F5F5F5</color>
+    <color name="gris_medio">#757575</color>
+
+    <color name="texto_principal">#212121</color>
+    <color name="texto_secundario">#616161</color>
+    <color name="texto_terciario">#9E9E9E</color>
+
+    <color name="boton_normal">#1E88E5</color>
+    <color name="boton_presionado">#1565C0</color>
+    <color name="texto_boton">#FFFFFF</color>
 </resources>

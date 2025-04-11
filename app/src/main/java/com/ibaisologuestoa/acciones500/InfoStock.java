@@ -59,8 +59,8 @@ public class InfoStock extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        aplicarIdioma();
         setContentView(R.layout.stock);
-
         Window w = getWindow();
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
@@ -117,7 +117,7 @@ public class InfoStock extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (traductor != null) {
+        if (!isChangingConfigurations() && traductor != null) {
         traductor.close();} // Segun api, es lo recomendado
     }
 
@@ -186,10 +186,13 @@ public class InfoStock extends AppCompatActivity {
 
                 traductor.downloadModelIfNeeded(conditions)
                         .addOnSuccessListener(unused -> {
+                            if (isFinishing()) return;
                             traductor.translate(txt)
                                     .addOnSuccessListener(texto_traducido -> {
-                                        desc.setText(texto_traducido);
-                                        Log.d("Traductor", "Traducción exitosa: " + texto_traducido);
+                                        if (!isFinishing()) {
+                                            desc.setText(texto_traducido);
+                                            Log.d("Traductor", "Traducción exitosa: " + texto_traducido);
+                                        }
                                     })
                                     .addOnFailureListener(e -> {
                                         Log.e("Traductor", "Error traducción: " + e.getMessage());
@@ -307,24 +310,20 @@ public class InfoStock extends AppCompatActivity {
     private void aplicarIdioma() {
         SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         String nuevoIdioma = prefs.getString("Idioma", "es");
-        String idiomaActual = Locale.getDefault().getLanguage();
 
-        if (nuevoIdioma.equals(idiomaActual)) {
+        Configuration config = getResources().getConfiguration();
+        Locale currentLocale = config.locale;
+
+        if (currentLocale.getLanguage().equals(nuevoIdioma)) {
             return;
         }
 
         Locale locale = new Locale(nuevoIdioma);
         Locale.setDefault(locale);
-
-        Resources res = getResources();
-        Configuration config = res.getConfiguration();
-
         config.setLocale(locale);
-        config.setLayoutDirection(locale);
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
 
-        res.updateConfiguration(config, res.getDisplayMetrics());
-
-        if (!isFinishing()) {
+        if (!isChangingConfigurations()) {
             recreate();
         }
     }

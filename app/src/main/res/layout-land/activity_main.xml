@@ -5,47 +5,47 @@
     android:id="@+id/dr"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/root"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
 
     <LinearLayout
-        android:id="@+id/main"
+        android:id="@+id/root"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".MainActivity">
 
-        <FrameLayout
-            android:id="@+id/container_antiguo"
-            android:layout_width="0dp"
+        <include
+            android:id="@+id/barra_menu"
+            layout="@layout/actionbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:id="@+id/main"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_height="match_parent" >
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv"
-                android:layout_width="match_parent"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:id="@+id/container_antiguo"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/container_nuevo"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="match_parent" />
-        </FrameLayout>
+        </LinearLayout>
 
-        <FrameLayout
-            android:id="@+id/container_nuevo"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent" />
     </LinearLayout>
-
-    <include
-        android:id="@+id/barra_menu"
-        layout="@layout/actionbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-</LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav"
