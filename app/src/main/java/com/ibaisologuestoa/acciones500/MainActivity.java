@@ -8,12 +8,18 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -83,6 +89,31 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
 
             NavigationView navigationView = findViewById(R.id.nav);
 
+            MenuItem perfilItem = navigationView.getMenu().findItem(R.id.n_perfil);
+            View nav_perfil = perfilItem.getActionView();
+
+
+            SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+            String emailus = prefs.getString("currentUser", "");
+            String nombreus = prefs.getString("currentUserName", "");
+
+            String clave = "imagen_" + emailus;
+            String imgGuardada = prefs.getString(clave, null);
+
+            ImageView imgV = nav_perfil.findViewById(R.id.imgPerfil);
+
+            if (imgGuardada != null) {
+                byte[] dBytes = Base64.decode(imgGuardada, Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(dBytes, 0, dBytes.length);
+                imgV.setImageBitmap(bitmap);
+            } else {
+                imgV.setImageResource(R.drawable.person2);
+            }
+
+            TextView nav_nombre = nav_perfil.findViewById(R.id.campoNombreNav);
+            TextView nav_email = nav_perfil.findViewById(R.id.campoEmail);
+            nav_email.setText(emailus);
+            nav_nombre.setText(nombreus);
             navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {

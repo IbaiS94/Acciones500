@@ -35,10 +35,26 @@ dependencies {
     implementation libs.material
     implementation libs.activity
     implementation libs.constraintlayout
+    implementation libs.media3.exoplayer
+    implementation libs.firebase.firestore
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
     implementation libs.volley
     implementation libs.material.v1110
-
+    implementation (libs.osmdroid.android){
+        exclude group: 'com.j256.ormlite', module: 'ormlite-core'
+    }
+    implementation (libs.osmdroid.wms){
+        exclude group: 'com.j256.ormlite', module: 'ormlite-core'
+    }
+    implementation (libs.osmdroid.mapsforge){
+        exclude group: 'com.j256.ormlite', module: 'ormlite-core'
+    }
+    implementation (libs.osmdroid.geopackage) {
+        exclude group: 'com.j256.ormlite', module: 'ormlite-core'
+    }
+    implementation libs.yahoofinanceapi
+    implementation libs.slf4j.api
+    implementation libs.logback.android
 }

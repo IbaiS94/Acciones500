@@ -4,10 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/header_profile"
+        android:id="@+id/n_perfil"
         android:title=""
         android:enabled="false"
-        app:actionLayout="@layout/nav_perfil" />
+        app:actionLayout="@layout/nav_perfil"
+        />
 
     <item android:title="@string/idim">
         <menu>

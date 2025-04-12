@@ -38,5 +38,5 @@
     <string name="bienvenido">¡Bienvenido, %s!</string>
     <string name="logeado_como">Logeado como: %s</string>
     <string name="cerrar_sesion">Cerrar Sesión</string>
-    <string name="foto_usuario">Foto de perfil</string>
+    <string name="foto_usuario">Seleccionar foto de perfil</string>
 </resources>

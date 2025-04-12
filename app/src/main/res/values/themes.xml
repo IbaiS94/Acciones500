@@ -30,4 +30,9 @@
         <item name="backgroundTint">@color/azul_600</item>
         <item name="android:textColor">@color/blanco</item>
     </style>
+
+    <style name="Ciculo" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">30%</item>
+    </style>
 </resources>

@@ -9,14 +9,19 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,14 +34,22 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
+import org.osmdroid.util.GeoPoint;
 import com.google.mlkit.common.model.DownloadConditions;
 import com.google.mlkit.nl.translate.TranslateLanguage;
 import com.google.mlkit.nl.translate.Translation;
 import com.google.mlkit.nl.translate.Translator;
 import com.google.mlkit.nl.translate.TranslatorOptions;
+
+import org.osmdroid.api.IMapController;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.views.CustomZoomButtonsController;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -54,12 +67,16 @@ public class InfoStock extends AppCompatActivity {
     private ActionBarDrawerToggle tg;
 
     private Translator traductor;
-
+    private MapView mapView;
+    private IMapController mapController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         aplicarIdioma();
+        Context ctx = getApplicationContext();
+        org.osmdroid.config.Configuration.getInstance().load(ctx,
+                PreferenceManager.getDefaultSharedPreferences(ctx));
         setContentView(R.layout.stock);
         Window w = getWindow();
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
@@ -69,6 +86,22 @@ public class InfoStock extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        mapView = findViewById(R.id.map);
+        mapView.setTileSource(TileSourceFactory.MAPNIK);
+
+        mapView.setMultiTouchControls(true);
+        mapController = mapView.getController();
+        mapController.setZoom(6.0);
+
+        GeoPoint startPoint = new GeoPoint(40.416775, -3.703790); // Madrid
+        mapController.setCenter(startPoint);
+
+        Marker marker = new Marker(mapView);
+        marker.setPosition(startPoint);
+        marker.setTitle("Sede de la compañia");
+        mapView.getOverlays().add(marker);
+
         Toolbar toolbar = findViewById(R.id.barra_menu);
         setSupportActionBar(toolbar);
 
@@ -82,6 +115,32 @@ public class InfoStock extends AppCompatActivity {
             tg.syncState();
 
             NavigationView navigationView = findViewById(R.id.nav);
+
+            MenuItem perfilItem = navigationView.getMenu().findItem(R.id.n_perfil);
+            View nav_perfil = perfilItem.getActionView();
+
+
+            SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+            String emailus = prefs.getString("currentUser", "");
+            String nombreus = prefs.getString("currentUserName", "");
+
+            String clave = "imagen_" + emailus;
+            String imgGuardada = prefs.getString(clave, null);
+
+            ImageView imgV = nav_perfil.findViewById(R.id.imgPerfil);
+
+            if (imgGuardada != null) {
+                byte[] dBytes = Base64.decode(imgGuardada, Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(dBytes, 0, dBytes.length);
+                imgV.setImageBitmap(bitmap);
+            } else {
+                imgV.setImageResource(R.drawable.person2);
+            }
+
+            TextView nav_nombre = nav_perfil.findViewById(R.id.campoNombreNav);
+            TextView nav_email = nav_perfil.findViewById(R.id.campoEmail);
+            nav_email.setText(emailus);
+            nav_nombre.setText(nombreus);
 
             navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
@@ -128,7 +187,7 @@ public class InfoStock extends AppCompatActivity {
         } else {
             db = db2;
         }
-        Cursor cursor = db.obtenerDescripcion();
+        Cursor cursor = db.obtenerDetallesCompletos();
 
 
         ////
@@ -306,6 +365,7 @@ public class InfoStock extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         guardarNotas();
+        mapView.onPause();
     }
     private void aplicarIdioma() {
         SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
