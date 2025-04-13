@@ -1,5 +1,8 @@
 package com.ibaisologuestoa.acciones500;
 
+import static android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM;
+
+import android.app.AlarmManager;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +11,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
@@ -18,6 +22,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -55,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
         setContentView(R.layout.activity_main);
 
         Window w = getWindow();
-        w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             getSupportFragmentManager().beginTransaction()
@@ -106,23 +110,49 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
             nav_email.setText(emailus);
             nav_nombre.setText(nombreus);
 
-            navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    int id = item.getItemId();
+            MenuItem alarmaItem = navigationView.getMenu().findItem(R.id.nav_alarma);
+            SharedPreferences prefs2 = getSharedPreferences("config_alarmas", MODE_PRIVATE);
+            boolean alarmaActiva = prefs2.getBoolean("alarma_activa", false);
+            alarmaItem.setChecked(alarmaActiva);
+
+            navigationView.setNavigationItemSelectedListener(item -> {
+                int id = item.getItemId();
+
+                if (id == R.id.nav_alarma) {
+                    SharedPreferences prefsAlarma = getSharedPreferences("config_alarmas", MODE_PRIVATE);
+                    boolean estadoActual = prefsAlarma.getBoolean("alarma_activa", false);
+                    boolean nuevoEstado = !estadoActual;
+
+                    prefsAlarma.edit().putBoolean("alarma_activa", nuevoEstado).apply();
+
+                    navigationView.setCheckedItem(id);
+
+                    MenuItem alarmaItem2= navigationView.getMenu().findItem(R.id.nav_alarma);
+                    if (alarmaItem2 != null) {
+                        alarmaItem2.setChecked(nuevoEstado);
+                    }
+
+                    if (nuevoEstado) {
+                        AlarmaMercados.programar(MainActivity.this, 8, 0);
+                        Toast.makeText(MainActivity.this, "Alarma activada ✅", Toast.LENGTH_SHORT).show();
+                    } else {
+                        AlarmaMercados.cancelar(MainActivity.this);
+                        Toast.makeText(MainActivity.this, "Alarma desactivada ❌", Toast.LENGTH_SHORT).show();
+                    }
+
+                    dr.closeDrawer(GravityCompat.START);
+                    return true;
+                }
+                else if (id == R.id.nav_1 || id == R.id.nav_2 || id == R.id.nav_3) {
                     new MaterialAlertDialogBuilder(MainActivity.this)
                             .setTitle(getString(R.string.conf))
                             .setMessage(getString(R.string.conf2))
                             .setPositiveButton("Ok", (dialog, which) -> {
                                 SharedPreferences preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
                                 SharedPreferences.Editor editor = preferences.edit();
-                                if (id == R.id.nav_1) {
-                                    editor.putString("Idioma", "es");
-                                } else if (id == R.id.nav_2) {
-                                    editor.putString("Idioma", "en");
-                                } else if (id == R.id.nav_3) {
-                                    editor.putString("Idioma", "de");
-                                }
+                                if (id == R.id.nav_1) editor.putString("Idioma", "es");
+                                else if (id == R.id.nav_2) editor.putString("Idioma", "en");
+                                else if (id == R.id.nav_3) editor.putString("Idioma", "de");
                                 editor.apply();
                                 aplicarIdioma();
                             })
@@ -130,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
                     dr.closeDrawer(GravityCompat.START);
                     return true;
                 }
+                return false;
             });
         }
         logicaLista();
@@ -140,6 +171,14 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
     @Override
     protected void onResume() {
         super.onResume();
+        NavigationView navigationView = findViewById(R.id.nav);
+        MenuItem alarmaItem = navigationView.getMenu().findItem(R.id.nav_alarma);
+        SharedPreferences prefsAlarma = getSharedPreferences("config_alarmas", MODE_PRIVATE);
+        boolean alarmaActiva = prefsAlarma.getBoolean("alarma_activa", false);
+        if (alarmaItem != null) {
+            alarmaItem.setChecked(alarmaActiva);
+        }
+
         new Thread(new Runnable() {
             @Override
             public void run() {

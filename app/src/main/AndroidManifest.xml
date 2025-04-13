@@ -19,6 +19,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <queries>
         <package android:name="com.tradingview.tradingviewapp" />
             <intent>
@@ -70,7 +72,16 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_info" />
         </receiver>
-
+        <receiver android:name=".ReceptorAlarma"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="ALERTA_APERTURA_MERCADOS" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
         <activity android:name=".widget.Widget_conf"
             android:exported="true">  <intent-filter>
             <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>

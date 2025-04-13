@@ -24,6 +24,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -78,7 +79,7 @@ public class InfoStock extends AppCompatActivity {
         setContentView(R.layout.stock);
 
         Window w = getWindow();
-        w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        // w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.cv), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -104,62 +105,90 @@ public class InfoStock extends AppCompatActivity {
         gestionInfo(null);
 
         dr = findViewById(R.id.dr);
-        if (dr != null) {
-            tg = new ActionBarDrawerToggle(this, dr, toolbar, R.string.nav_abrir, R.string.nav_cerar);
-            dr.addDrawerListener(tg);
-            tg.syncState();
+            if (dr != null) {
+                tg = new ActionBarDrawerToggle(this, dr, toolbar, R.string.nav_abrir, R.string.nav_cerar);
+                dr.addDrawerListener(tg);
+                tg.syncState();
 
-            NavigationView navigationView = findViewById(R.id.nav);
-            MenuItem perfilItem = navigationView.getMenu().findItem(R.id.n_perfil);
-            View nav_perfil = perfilItem.getActionView();
+                NavigationView navigationView = findViewById(R.id.nav);
+                MenuItem perfilItem = navigationView.getMenu().findItem(R.id.n_perfil);
+                View nav_perfil = perfilItem.getActionView();
 
-            SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-            String emailus = prefs.getString("currentUser", "");
-            String nombreus = prefs.getString("currentUserName", "");
-            String clave = "imagen_" + emailus;
-            String imgGuardada = prefs.getString(clave, null);
+                SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                String emailus = prefs.getString("currentUser", "");
+                String nombreus = prefs.getString("currentUserName", "");
+                String clave = "imagen_" + emailus;
+                String imgGuardada = prefs.getString(clave, null);
 
-            ImageView imgV = nav_perfil.findViewById(R.id.imgPerfil);
-            if (imgGuardada != null) {
-                byte[] dBytes = Base64.decode(imgGuardada, Base64.DEFAULT);
-                Bitmap bitmap = BitmapFactory.decodeByteArray(dBytes, 0, dBytes.length);
-                imgV.setImageBitmap(bitmap);
-            } else {
-                imgV.setImageResource(R.drawable.person2);
-            }
-
-            TextView nav_nombre = nav_perfil.findViewById(R.id.campoNombreNav);
-            TextView nav_email = nav_perfil.findViewById(R.id.campoEmail);
-            nav_email.setText(emailus);
-            nav_nombre.setText(nombreus);
-
-            navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    int id = item.getItemId();
-                    new MaterialAlertDialogBuilder(InfoStock.this)
-                            .setTitle(getString(R.string.conf))
-                            .setMessage(getString(R.string.conf2))
-                            .setPositiveButton("Ok", (dialog, which) -> {
-                                SharedPreferences preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
-                                SharedPreferences.Editor editor = preferences.edit();
-                                if (id == R.id.nav_1) {
-                                    editor.putString("Idioma", "es");
-                                } else if (id == R.id.nav_2) {
-                                    editor.putString("Idioma", "en");
-                                } else if (id == R.id.nav_3) {
-                                    editor.putString("Idioma", "de");
-                                }
-                                editor.apply();
-                                aplicarIdioma();
-                            })
-                            .show();
-                    dr.closeDrawer(GravityCompat.START);
-                    return true;
+                ImageView imgV = nav_perfil.findViewById(R.id.imgPerfil);
+                if (imgGuardada != null) {
+                    byte[] dBytes = Base64.decode(imgGuardada, Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(dBytes, 0, dBytes.length);
+                    imgV.setImageBitmap(bitmap);
+                } else {
+                    imgV.setImageResource(R.drawable.person2);
                 }
-            });
+
+                TextView nav_nombre = nav_perfil.findViewById(R.id.campoNombreNav);
+                TextView nav_email = nav_perfil.findViewById(R.id.campoEmail);
+                nav_email.setText(emailus);
+                nav_nombre.setText(nombreus);
+
+                MenuItem alarmaItem = navigationView.getMenu().findItem(R.id.nav_alarma);
+                SharedPreferences prefs2 = getSharedPreferences("config_alarmas", MODE_PRIVATE);
+                boolean alarmaActiva = prefs2.getBoolean("alarma_activa", false);
+                alarmaItem.setChecked(alarmaActiva);
+
+                navigationView.setNavigationItemSelectedListener(item -> {
+                    int id = item.getItemId();
+
+                    if (id == R.id.nav_alarma) {
+                        SharedPreferences prefsAlarma = getSharedPreferences("config_alarmas", MODE_PRIVATE);
+                        boolean estadoActual = prefsAlarma.getBoolean("alarma_activa", false);
+                        boolean nuevoEstado = !estadoActual;
+
+                        prefsAlarma.edit().putBoolean("alarma_activa", nuevoEstado).apply();
+
+                        navigationView.setCheckedItem(id);
+
+                        MenuItem alarmaItem2 = navigationView.getMenu().findItem(R.id.nav_alarma);
+                        if (alarmaItem2 != null) {
+                            alarmaItem2.setChecked(nuevoEstado);
+                        }
+
+                        if (nuevoEstado) {
+                            AlarmaMercados.programar(InfoStock.this, 8, 0);
+                            Toast.makeText(InfoStock.this, "Alarma activada ✅", Toast.LENGTH_SHORT).show();
+                        } else {
+                            AlarmaMercados.cancelar(InfoStock.this);
+                            Toast.makeText(InfoStock.this, "Alarma desactivada ❌", Toast.LENGTH_SHORT).show();
+                        }
+
+                        dr.closeDrawer(GravityCompat.START);
+                        return true;
+                    } else if (id == R.id.nav_1 || id == R.id.nav_2 || id == R.id.nav_3) {
+                        new MaterialAlertDialogBuilder(InfoStock.this)
+                                .setTitle(getString(R.string.conf))
+                                .setMessage(getString(R.string.conf2))
+                                .setPositiveButton("Ok", (dialog, which) -> {
+                                    SharedPreferences preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = preferences.edit();
+                                    if (id == R.id.nav_1) editor.putString("Idioma", "es");
+                                    else if (id == R.id.nav_2) editor.putString("Idioma", "en");
+                                    else if (id == R.id.nav_3) editor.putString("Idioma", "de");
+                                    editor.apply();
+                                    aplicarIdioma();
+                                })
+                                .show();
+                        dr.closeDrawer(GravityCompat.START);
+                        return true;
+                    }
+                    return false;
+                });
+            }
+            aplicarIdioma();
         }
-    }
+
 
     @Override
     protected void onStop() {
@@ -243,7 +272,7 @@ public class InfoStock extends AppCompatActivity {
                         });
 
                 TextView prec = findViewById(R.id.stockPrecio);
-                String euro = cursor.getString(3) + "$";
+                String euro = cursor.getString(3) + " $";
                 Log.d("Precio", "Precio recuperado de la BD para " + nombre + ": " + euro);
                 prec.setText(euro);
 

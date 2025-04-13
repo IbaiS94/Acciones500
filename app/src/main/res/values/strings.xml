@@ -42,4 +42,6 @@
     <string name="selecciona_accion_widget">Selecciona una acción para el widget</string>
     <string name="configurar">Configurar</string>
     <string name="refresh">Actualizar</string>
+    <string name="alertas">Alertas</string>
+    <string name="alerta_mercados">Aviso de apertura de mercados</string>
 </resources>
