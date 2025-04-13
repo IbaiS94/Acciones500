@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialKeyguardLayout="@layout/widget"
+    android:initialLayout="@layout/widget"
+    android:minWidth="110dp"
+    android:minHeight="40dp"
+    android:previewImage="@drawable/star"
+    android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="180000"
+    android:widgetCategory="home_screen"
+    android:configure="com.ibaisologuestoa.acciones500.widget.Widget_conf">
+</appwidget-provider>

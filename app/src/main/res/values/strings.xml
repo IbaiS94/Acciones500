@@ -39,4 +39,7 @@
     <string name="logeado_como">Logeado como: %s</string>
     <string name="cerrar_sesion">Cerrar Sesión</string>
     <string name="foto_usuario">Seleccionar foto de perfil</string>
+    <string name="selecciona_accion_widget">Selecciona una acción para el widget</string>
+    <string name="configurar">Configurar</string>
+    <string name="refresh">Actualizar</string>
 </resources>

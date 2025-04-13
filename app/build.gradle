@@ -54,7 +54,6 @@ dependencies {
     implementation (libs.osmdroid.geopackage) {
         exclude group: 'com.j256.ormlite', module: 'ormlite-core'
     }
-    implementation libs.yahoofinanceapi
-    implementation libs.slf4j.api
-    implementation libs.logback.android
+
+
 }

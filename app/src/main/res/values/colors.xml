@@ -19,4 +19,9 @@
     <color name="boton_normal">#1E88E5</color>
     <color name="boton_presionado">#1565C0</color>
     <color name="texto_boton">#FFFFFF</color>
+    <color name="widget_fondo">#FFFFFF</color>
+    <color name="widget_texto_nombre">#FF000000</color>
+    <color name="widget_texto_precio">#FF4CAF50</color>
+    <color name="widget_texto_fecha">#FF607D8B</color>
+
 </resources>

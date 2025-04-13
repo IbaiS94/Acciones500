@@ -14,4 +14,9 @@
 
     <color name="texto_principal">#FFFFFF</color>
     <color name="texto_secundario">#B0B0B0</color>
+    <color name="widget_fondo">#000000</color>
+    <color name="widget_texto_nombre">#FFFFFF</color>
+    <color name="widget_texto_precio">#01B608</color>
+    <color name="widget_texto_fecha">#CEE0E6</color>
+
 </resources>

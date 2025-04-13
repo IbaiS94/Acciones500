@@ -1,4 +1,4 @@
-package com.ibaisologuestoa.acciones500; // Cambia esto por el nombre de tu paquete
+package com.ibaisologuestoa.acciones500;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,11 +23,10 @@ import java.util.List;
 
 public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> {
 
-    private List<String> listaItems;
+    private List<StockItem> listaItems;
     private Context context;
 
-    // Constructor del adaptador
-    public AdaptadorRv(Context context, List<String> listaItems) {
+    public AdaptadorRv(Context context, List<StockItem> listaItems) {
         this.context = context;
         this.listaItems = listaItems;
     }
@@ -35,19 +34,17 @@ public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> 
     @NonNull
     @Override
     public MiViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Infla el layout del ítem
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler, parent, false);
         return new MiViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MiViewHolder holder, int position) {
-        String item = listaItems.get(position);
-        holder.textoItem.setText(item);
-
-        // Verificar si el elemento actual es favorito
+        StockItem item = listaItems.get(position);
+        holder.textoItem.setText(item.nombre);
+        holder.textoPrecio.setText(String.format("%.2f $", item.precio));
         StockDB stockDB = new StockDB(context);
-        boolean esFavorito = stockDB.esFavorito(item);
+        boolean esFavorito = stockDB.esFavorito(item.nombre);
         stockDB.close();
 
         if (esFavorito) {
@@ -65,14 +62,15 @@ public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> 
     }
 
     public class MiViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
         TextView textoItem;
+        TextView textoPrecio;
         ImageButton favBot;
 
         public MiViewHolder(@NonNull View itemView) {
             super(itemView);
             textoItem = itemView.findViewById(R.id.tvItem);
-            favBot= itemView.findViewById(R.id.fav_bot);
+            textoPrecio = itemView.findViewById(R.id.tvPrecio);
+            favBot = itemView.findViewById(R.id.fav_bot);
             itemView.setOnClickListener(this);
             favBot.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -88,13 +86,13 @@ public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> 
                                         favBot.setTag("fav");
                                         StockDB t = new StockDB(itemView.getContext());
                                         SQLiteDatabase db = t.getWritableDatabase();
-                                        t.actualizar(db, listaItems.get(getAdapterPosition()), Boolean.TRUE);
+                                        t.actualizar(db, listaItems.get(getAdapterPosition()).nombre, Boolean.TRUE);
                                     } else {
-                                        favBot.setImageResource(R.drawable.favorite);
+                                        favBot.setImageResource(R.drawable.star);
                                         favBot.setTag("fav_no");
                                         StockDB t = new StockDB(itemView.getContext());
                                         SQLiteDatabase db = t.getWritableDatabase();
-                                        t.actualizar(db, listaItems.get(getAdapterPosition()), Boolean.FALSE);
+                                        t.actualizar(db, listaItems.get(getAdapterPosition()).nombre, Boolean.FALSE);
                                     }
                                 }
                             })
@@ -104,34 +102,26 @@ public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> 
             });
         }
 
-
         @Override
         public void onClick(View v) {
             int posicion = getAdapterPosition();
             if (posicion != RecyclerView.NO_POSITION) {
                 View containerNuevo = ((Activity) context).findViewById(R.id.container_nuevo);
                 if (containerNuevo != null) {
-                    //modo landscape
                     FragmentNuevo fragment = new FragmentNuevo();
                     Bundle args = new Bundle();
-                    args.putString("nombre", listaItems.get(posicion));
+                    args.putString("nombre", listaItems.get(posicion).nombre);
                     fragment.setArguments(args);
                     ((AppCompatActivity) context).getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.container_nuevo, fragment)
                             .commit();
-
                 } else {
-                    //modo portrait
                     Intent intent = new Intent(context, InfoStock.class);
-                    intent.putExtra("nombre", listaItems.get(posicion));
+                    intent.putExtra("nombre", listaItems.get(posicion).nombre);
                     context.startActivity(intent);
                 }
             }
         }
-
-
-
     }
-
 }

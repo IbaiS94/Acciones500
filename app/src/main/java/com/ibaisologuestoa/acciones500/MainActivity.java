@@ -1,8 +1,6 @@
 package com.ibaisologuestoa.acciones500;
+
 import android.app.SearchManager;
-
-import static java.lang.Boolean.FALSE;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -42,14 +40,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-
 public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnNombreActualizadoListener {
     public static final String PREFS = "Prefs";
     public static final String TEMA = "esDarkMode";
     private boolean modfavorito = false;
-
     private String nombre = "";
-
     private DrawerLayout dr;
     private ActionBarDrawerToggle tg;
 
@@ -64,13 +59,12 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container_nuevo, new com.ibaisologuestoa.acciones500.FragmentNuevo())
-                    .replace(R.id.container_antiguo, new com.ibaisologuestoa.acciones500.FragmentAntiguo())
+                    .replace(R.id.container_nuevo, new FragmentNuevo())
+                    .replace(R.id.container_antiguo, new FragmentAntiguo())
                     .commit();
         }
 
-        //da null
-        if(findViewById(R.id.main) == null){
+        if (findViewById(R.id.main) == null) {
             Log.d("FAKE NEWS", "MAIN NULL");
         }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -78,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         Toolbar toolbar = findViewById(R.id.barra_menu);
         setSupportActionBar(toolbar);
 
@@ -88,20 +83,16 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
             tg.syncState();
 
             NavigationView navigationView = findViewById(R.id.nav);
-
             MenuItem perfilItem = navigationView.getMenu().findItem(R.id.n_perfil);
             View nav_perfil = perfilItem.getActionView();
-
 
             SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
             String emailus = prefs.getString("currentUser", "");
             String nombreus = prefs.getString("currentUserName", "");
-
             String clave = "imagen_" + emailus;
             String imgGuardada = prefs.getString(clave, null);
 
             ImageView imgV = nav_perfil.findViewById(R.id.imgPerfil);
-
             if (imgGuardada != null) {
                 byte[] dBytes = Base64.decode(imgGuardada, Base64.DEFAULT);
                 Bitmap bitmap = BitmapFactory.decodeByteArray(dBytes, 0, dBytes.length);
@@ -114,18 +105,17 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
             TextView nav_email = nav_perfil.findViewById(R.id.campoEmail);
             nav_email.setText(emailus);
             nav_nombre.setText(nombreus);
+
             navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     int id = item.getItemId();
-
                     new MaterialAlertDialogBuilder(MainActivity.this)
                             .setTitle(getString(R.string.conf))
                             .setMessage(getString(R.string.conf2))
                             .setPositiveButton("Ok", (dialog, which) -> {
                                 SharedPreferences preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
                                 SharedPreferences.Editor editor = preferences.edit();
-
                                 if (id == R.id.nav_1) {
                                     editor.putString("Idioma", "es");
                                 } else if (id == R.id.nav_2) {
@@ -133,12 +123,10 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
                                 } else if (id == R.id.nav_3) {
                                     editor.putString("Idioma", "de");
                                 }
-
                                 editor.apply();
                                 aplicarIdioma();
                             })
                             .show();
-
                     dr.closeDrawer(GravityCompat.START);
                     return true;
                 }
@@ -147,55 +135,63 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
         logicaLista();
         restaurarTema();
         aplicarIdioma();
-
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                StockDB db = new StockDB(MainActivity.this);
+                db.actualizarDesdeAlpaca();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        logicaLista();
+                    }
+                });
+            }
+        }).start();
+    }
+
     @Override
     public void onNombreActualizado(String nombreActualizado) {
         Log.d("NombreActualizado", nombreActualizado);
         nombre = nombreActualizado;
     }
-    public void logicaLista(){
-        modfavorito = getIntent().getBooleanExtra("favs", FALSE);
 
+    public void logicaLista() {
+        modfavorito = getIntent().getBooleanExtra("favs", false);
         RecyclerView recyclerView = findViewById(R.id.rv);
-        Log.d("DEBUG", String.valueOf(recyclerView));
-        List<String> listaDatos = new ArrayList<>();
+        List<StockItem> listaDatos = new ArrayList<>();
         StockDB db = new StockDB(this);
-        Cursor cursor = db.obtenerNombres();
-        //db.insertar("Apple",Boolean.FALSE); //Mover a StockDB para que no se genere cada vez
-        if(modfavorito){
-            while(cursor.moveToNext()){
-                if(cursor.getInt(2) == 1){
-                    listaDatos.add(cursor.getString(1));
-                }
+        Cursor cursor = db.obtenerNombresYPrecios();
 
+        while (cursor.moveToNext()) {
+            String nombre = cursor.getString(0);  // Columna 0: nombre
+            double precio = cursor.getDouble(1);  // Columna 1: precio
+            if (modfavorito) {
+                if (db.esFavorito(nombre)) {
+                    listaDatos.add(new StockItem(nombre, precio));
+                }
+            } else {
+                listaDatos.add(new StockItem(nombre, precio));
             }
         }
-        else{
-            while(cursor.moveToNext()){
-                listaDatos.add(cursor.getString(1));
-
-            }}
-
-        if(recyclerView != null){
-            com.ibaisologuestoa.acciones500.AdaptadorRv adapt = new com.ibaisologuestoa.acciones500.AdaptadorRv(this, listaDatos);
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            recyclerView.setAdapter(adapt);}
-
-
-        /*       if (cursor.moveToFirst()) {
-            Integer nombre = cursor.getCount();
-            Toast.makeText(this, String.valueOf(nombre), Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "No hay datos", Toast.LENGTH_SHORT).show();
-        } */
         cursor.close();
+
+        if (recyclerView != null) {
+            AdaptadorRv adapt = new AdaptadorRv(this, listaDatos);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setAdapter(adapt);
+        }
     }
     @Override
     public void onBackPressed() {
         if (modfavorito) {
             Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra("favs", FALSE);
+            intent.putExtra("favs", false);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         } else {
@@ -205,62 +201,59 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
 
     private void restaurarTema() {
         SharedPreferences preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
-        boolean esDarkMode = preferences.getBoolean(TEMA, false); // false es el valor por defecto
-
+        boolean esDarkMode = preferences.getBoolean(TEMA, false);
         AppCompatDelegate.setDefaultNightMode(
                 esDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
         );
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-            getMenuInflater().inflate(R.menu.menu, menu);
-            MenuItem boton = menu.findItem(R.id.action_tema);
-            boton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    int esteMode = AppCompatDelegate.getDefaultNightMode();
-                    boolean esDarkMode = esteMode != AppCompatDelegate.MODE_NIGHT_YES;
+        getMenuInflater().inflate(R.menu.menu, menu);
+        MenuItem boton = menu.findItem(R.id.action_tema);
+        boton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int esteMode = AppCompatDelegate.getDefaultNightMode();
+                boolean esDarkMode = esteMode != AppCompatDelegate.MODE_NIGHT_YES;
+                SharedPreferences preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putBoolean(TEMA, esDarkMode);
+                editor.apply();
+                AppCompatDelegate.setDefaultNightMode(
+                        esDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
+                );
+                recreate();
+                return true;
+            }
+        });
 
-                    // Guardar la preferencia
-                    SharedPreferences preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putBoolean(TEMA, esDarkMode);
-                    editor.apply();
-
-                    // Aplicar el tema
-                    AppCompatDelegate.setDefaultNightMode(
-                            esDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
-                    );
-
-                    recreate();
-                    return true;
+        MenuItem boton2 = menu.findItem(R.id.action_search);
+        boton2.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+                String busqueda = getString(R.string.accnot);
+                if (!nombre.equals("")) {
+                    busqueda = getString(R.string.acc) + nombre;
                 }
-            });
+                intent.putExtra(SearchManager.QUERY, busqueda);
+                startActivity(intent);
+                return true;
+            }
+        });
 
-            MenuItem boton2 = menu.findItem(R.id.action_search);
-            boton2.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-                    String busqueda = getString(R.string.accnot);
-                    if(!nombre.equals("")){
-                    busqueda = getString(R.string.acc)+nombre;}
-                    intent.putExtra(SearchManager.QUERY, busqueda);
-                    startActivity(intent);
-                    return true;
-                }
-            });
-            MenuItem boton3 = menu.findItem(R.id.fav_menu);
-            boton3.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                    intent.putExtra("favs", !modfavorito);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
-                    return true;
-                }
-            });
+        MenuItem boton3 = menu.findItem(R.id.fav_menu);
+        boton3.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                intent.putExtra("favs", !modfavorito);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+            }
+        });
 
         return true;
     }
@@ -276,17 +269,14 @@ public class MainActivity extends AppCompatActivity implements FragmentNuevo.OnN
 
         Locale locale = new Locale(nuevoIdioma);
         Locale.setDefault(locale);
-
         Resources res = getResources();
         Configuration config = res.getConfiguration();
         config.setLocale(locale);
         config.setLayoutDirection(locale);
-
         res.updateConfiguration(config, res.getDisplayMetrics());
 
         if (!isFinishing()) {
             recreate();
         }
     }
-
 }
