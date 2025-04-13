@@ -55,7 +55,7 @@
                     android:textSize="28sp"
                     android:textStyle="bold"
                     android:layout_marginTop="16dp"
-                    android:drawableStart="@drawable/person"
+                    android:drawableStart="@drawable/person2"
                     android:drawablePadding="8dp"
                     android:drawableTint="@color/white"/>
 
