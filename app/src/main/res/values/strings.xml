@@ -44,4 +44,6 @@
     <string name="refresh">Actualizar</string>
     <string name="alertas">Alertas</string>
     <string name="alerta_mercados">Aviso de apertura de mercados</string>
+    <string name="sede_empresa">Sede de la empresa</string>
+
 </resources>

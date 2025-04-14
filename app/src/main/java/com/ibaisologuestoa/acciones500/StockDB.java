@@ -40,6 +40,14 @@ public class StockDB extends SQLiteOpenHelper {
                     "Notas TEXT, " +
                     "Similares TEXT)";
 
+    private static final String ubicaciones =
+            "CREATE TABLE Ubicaciones (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "ticker TEXT UNIQUE, " +
+                    "latitud DOUBLE, " +
+                    "longitud DOUBLE, " +
+                    "nombre_sede TEXT)";
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL);
@@ -105,12 +113,33 @@ public class StockDB extends SQLiteOpenHelper {
         insertarDetalles(db, "IBD",
                 "Iberdrola es una multinacional destacada en energías renovables.",
                 10.0, "KO");
+
+        // Crear tabla de ubicaciones
+        db.execSQL(ubicaciones);
+
+        // Insertar ubicaciones de las sedes de las empresas
+        insertarUbicacion(db, "AAPL", 37.334722, -122.008889, "Apple Park, Cupertino, California");
+        insertarUbicacion(db, "MSFT", 47.639722, -122.128333, "Microsoft Campus, Redmond, Washington");
+        insertarUbicacion(db, "GOOGL", 37.422, -122.084, "Googleplex, Mountain View, California");
+        insertarUbicacion(db, "YUM", 38.2527, -85.7585, "Louisville, Kentucky");
+        insertarUbicacion(db, "BLK", 40.755833, -73.978333, "Nueva York, Nueva York");
+        insertarUbicacion(db, "AMD", 37.3821, -121.9641, "Santa Clara, California");
+        insertarUbicacion(db, "SPY", 40.7128, -74.0060, "Nueva York, Nueva York");
+        insertarUbicacion(db, "NVO", 55.7496, 12.3052, "Bagsværd, Dinamarca");
+        insertarUbicacion(db, "UBER", 37.7749, -122.4194, "San Francisco, California");
+        insertarUbicacion(db, "TSLA", 37.3947, -122.1503, "Palo Alto, California");
+        insertarUbicacion(db, "U", 37.7749, -122.4194, "San Francisco, California");
+        insertarUbicacion(db, "INTC", 37.3875, -121.9636, "Santa Clara, California");
+        insertarUbicacion(db, "NVDA", 37.3745, -121.9597, "Santa Clara, California");
+        insertarUbicacion(db, "KO", 33.7490, -84.3880, "Atlanta, Georgia");
+        insertarUbicacion(db, "IBD", 40.416775, -3.703790, "Madrid, España");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS Stocks");
         db.execSQL("DROP TABLE IF EXISTS Detalles");
+        db.execSQL("DROP TABLE IF EXISTS Ubicaciones");
         onCreate(db);
     }
 
@@ -138,6 +167,15 @@ public class StockDB extends SQLiteOpenHelper {
         db.insert("Detalles", null, cv);
     }
 
+    public void insertarUbicacion(SQLiteDatabase db, String ticker, double latitud, double longitud, String nombreSede) {
+        ContentValues cv = new ContentValues();
+        cv.put("ticker", ticker);
+        cv.put("latitud", latitud);
+        cv.put("longitud", longitud);
+        cv.put("nombre_sede", nombreSede);
+        db.insert("Ubicaciones", null, cv);
+    }
+
     public void actualizarDetalle(SQLiteDatabase db, String nombre, double nuevoPrecio) {
         ContentValues cv = new ContentValues();
         cv.put("Precio", nuevoPrecio);
@@ -154,6 +192,17 @@ public class StockDB extends SQLiteOpenHelper {
     public Cursor obtenerDescripcion() {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM Detalles", null);
+    }
+
+    public Cursor obtenerUbicacion(String ticker) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query(
+                "Ubicaciones",
+                null,
+                "ticker = ?",
+                new String[]{ticker},
+                null, null, null
+        );
     }
 
     public boolean esFavorito(String nombre) {

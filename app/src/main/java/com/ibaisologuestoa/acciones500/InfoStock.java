@@ -4,6 +4,7 @@ import static com.ibaisologuestoa.acciones500.MainActivity.PREFS;
 import static com.ibaisologuestoa.acciones500.MainActivity.TEMA;
 
 import android.app.SearchManager;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +13,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
@@ -20,13 +22,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -79,7 +79,6 @@ public class InfoStock extends AppCompatActivity {
         setContentView(R.layout.stock);
 
         Window w = getWindow();
-        // w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.cv), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -92,12 +91,6 @@ public class InfoStock extends AppCompatActivity {
         mapView.setMultiTouchControls(true);
         mapController = mapView.getController();
         mapController.setZoom(6.0);
-        GeoPoint startPoint = new GeoPoint(40.416775, -3.703790); // Madrid
-        mapController.setCenter(startPoint);
-        Marker marker = new Marker(mapView);
-        marker.setPosition(startPoint);
-        marker.setTitle("Sede de la compañia");
-        mapView.getOverlays().add(marker);
 
         Toolbar toolbar = findViewById(R.id.barra_menu);
         setSupportActionBar(toolbar);
@@ -105,89 +98,89 @@ public class InfoStock extends AppCompatActivity {
         gestionInfo(null);
 
         dr = findViewById(R.id.dr);
-            if (dr != null) {
-                tg = new ActionBarDrawerToggle(this, dr, toolbar, R.string.nav_abrir, R.string.nav_cerar);
-                dr.addDrawerListener(tg);
-                tg.syncState();
+        if (dr != null) {
+            tg = new ActionBarDrawerToggle(this, dr, toolbar, R.string.nav_abrir, R.string.nav_cerar);
+            dr.addDrawerListener(tg);
+            tg.syncState();
 
-                NavigationView navigationView = findViewById(R.id.nav);
-                MenuItem perfilItem = navigationView.getMenu().findItem(R.id.n_perfil);
-                View nav_perfil = perfilItem.getActionView();
+            NavigationView navigationView = findViewById(R.id.nav);
+            MenuItem perfilItem = navigationView.getMenu().findItem(R.id.n_perfil);
+            View nav_perfil = perfilItem.getActionView();
 
-                SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-                String emailus = prefs.getString("currentUser", "");
-                String nombreus = prefs.getString("currentUserName", "");
-                String clave = "imagen_" + emailus;
-                String imgGuardada = prefs.getString(clave, null);
+            SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+            String emailus = prefs.getString("currentUser", "");
+            String nombreus = prefs.getString("currentUserName", "");
+            String clave = "imagen_" + emailus;
+            String imgGuardada = prefs.getString(clave, null);
 
-                ImageView imgV = nav_perfil.findViewById(R.id.imgPerfil);
-                if (imgGuardada != null) {
-                    byte[] dBytes = Base64.decode(imgGuardada, Base64.DEFAULT);
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(dBytes, 0, dBytes.length);
-                    imgV.setImageBitmap(bitmap);
-                } else {
-                    imgV.setImageResource(R.drawable.person2);
-                }
-
-                TextView nav_nombre = nav_perfil.findViewById(R.id.campoNombreNav);
-                TextView nav_email = nav_perfil.findViewById(R.id.campoEmail);
-                nav_email.setText(emailus);
-                nav_nombre.setText(nombreus);
-
-                MenuItem alarmaItem = navigationView.getMenu().findItem(R.id.nav_alarma);
-                SharedPreferences prefs2 = getSharedPreferences("config_alarmas", MODE_PRIVATE);
-                boolean alarmaActiva = prefs2.getBoolean("alarma_activa", false);
-                alarmaItem.setChecked(alarmaActiva);
-
-                navigationView.setNavigationItemSelectedListener(item -> {
-                    int id = item.getItemId();
-
-                    if (id == R.id.nav_alarma) {
-                        SharedPreferences prefsAlarma = getSharedPreferences("config_alarmas", MODE_PRIVATE);
-                        boolean estadoActual = prefsAlarma.getBoolean("alarma_activa", false);
-                        boolean nuevoEstado = !estadoActual;
-
-                        prefsAlarma.edit().putBoolean("alarma_activa", nuevoEstado).apply();
-
-                        navigationView.setCheckedItem(id);
-
-                        MenuItem alarmaItem2 = navigationView.getMenu().findItem(R.id.nav_alarma);
-                        if (alarmaItem2 != null) {
-                            alarmaItem2.setChecked(nuevoEstado);
-                        }
-
-                        if (nuevoEstado) {
-                            AlarmaMercados.programar(InfoStock.this, 8, 0);
-                            Toast.makeText(InfoStock.this, "Alarma activada ✅", Toast.LENGTH_SHORT).show();
-                        } else {
-                            AlarmaMercados.cancelar(InfoStock.this);
-                            Toast.makeText(InfoStock.this, "Alarma desactivada ❌", Toast.LENGTH_SHORT).show();
-                        }
-
-                        dr.closeDrawer(GravityCompat.START);
-                        return true;
-                    } else if (id == R.id.nav_1 || id == R.id.nav_2 || id == R.id.nav_3) {
-                        new MaterialAlertDialogBuilder(InfoStock.this)
-                                .setTitle(getString(R.string.conf))
-                                .setMessage(getString(R.string.conf2))
-                                .setPositiveButton("Ok", (dialog, which) -> {
-                                    SharedPreferences preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = preferences.edit();
-                                    if (id == R.id.nav_1) editor.putString("Idioma", "es");
-                                    else if (id == R.id.nav_2) editor.putString("Idioma", "en");
-                                    else if (id == R.id.nav_3) editor.putString("Idioma", "de");
-                                    editor.apply();
-                                    aplicarIdioma();
-                                })
-                                .show();
-                        dr.closeDrawer(GravityCompat.START);
-                        return true;
-                    }
-                    return false;
-                });
+            ImageView imgV = nav_perfil.findViewById(R.id.imgPerfil);
+            if (imgGuardada != null) {
+                byte[] dBytes = Base64.decode(imgGuardada, Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(dBytes, 0, dBytes.length);
+                imgV.setImageBitmap(bitmap);
+            } else {
+                imgV.setImageResource(R.drawable.person2);
             }
-            aplicarIdioma();
+
+            TextView nav_nombre = nav_perfil.findViewById(R.id.campoNombreNav);
+            TextView nav_email = nav_perfil.findViewById(R.id.campoEmail);
+            nav_email.setText(emailus);
+            nav_nombre.setText(nombreus);
+
+            MenuItem alarmaItem = navigationView.getMenu().findItem(R.id.nav_alarma);
+            SharedPreferences prefs2 = getSharedPreferences("config_alarmas", MODE_PRIVATE);
+            boolean alarmaActiva = prefs2.getBoolean("alarma_activa", false);
+            alarmaItem.setChecked(alarmaActiva);
+
+            navigationView.setNavigationItemSelectedListener(item -> {
+                int id = item.getItemId();
+
+                if (id == R.id.nav_alarma) {
+                    SharedPreferences prefsAlarma = getSharedPreferences("config_alarmas", MODE_PRIVATE);
+                    boolean estadoActual = prefsAlarma.getBoolean("alarma_activa", false);
+                    boolean nuevoEstado = !estadoActual;
+
+                    prefsAlarma.edit().putBoolean("alarma_activa", nuevoEstado).apply();
+
+                    navigationView.setCheckedItem(id);
+
+                    MenuItem alarmaItem2 = navigationView.getMenu().findItem(R.id.nav_alarma);
+                    if (alarmaItem2 != null) {
+                        alarmaItem2.setChecked(nuevoEstado);
+                    }
+
+                    if (nuevoEstado) {
+                        AlarmaMercados.programar(InfoStock.this, 8, 0);
+                        Toast.makeText(InfoStock.this, "Alarma activada ✅", Toast.LENGTH_SHORT).show();
+                    } else {
+                        AlarmaMercados.cancelar(InfoStock.this);
+                        Toast.makeText(InfoStock.this, "Alarma desactivada ❌", Toast.LENGTH_SHORT).show();
+                    }
+
+                    dr.closeDrawer(GravityCompat.START);
+                    return true;
+                } else if (id == R.id.nav_1 || id == R.id.nav_2 || id == R.id.nav_3) {
+                    new MaterialAlertDialogBuilder(InfoStock.this)
+                            .setTitle(getString(R.string.conf))
+                            .setMessage(getString(R.string.conf2))
+                            .setPositiveButton("Ok", (dialog, which) -> {
+                                SharedPreferences preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
+                                SharedPreferences.Editor editor = preferences.edit();
+                                if (id == R.id.nav_1) editor.putString("Idioma", "es");
+                                else if (id == R.id.nav_2) editor.putString("Idioma", "en");
+                                else if (id == R.id.nav_3) editor.putString("Idioma", "de");
+                                editor.apply();
+                                aplicarIdioma();
+                            })
+                            .show();
+                    dr.closeDrawer(GravityCompat.START);
+                    return true;
+                }
+                return false;
+            });
         }
+        aplicarIdioma();
+    }
 
 
     @Override
@@ -281,6 +274,9 @@ public class InfoStock extends AppCompatActivity {
 
                 TextView sim = findViewById(R.id.stockSimilar);
                 sim.setText(getString(R.string.relacionado) + " " + cursor.getString(5));
+
+                // Cargar la ubicación de la sede de la empresa usando ContentProvider
+                cargarUbicacionEmpresa(nombre);
             }
         }
 
@@ -302,6 +298,56 @@ public class InfoStock extends AppCompatActivity {
                 startActivity(playStoreIntent);
             }
         });
+    }
+
+    private void cargarUbicacionEmpresa(String ticker) {
+        Uri uri = Uri.parse("content://com.ibaisologuestoa.acciones500.ubicacionesprovider/ubicaciones");
+        String selection = "ticker = ?";
+        String[] selectionArgs = {ticker};
+
+        Cursor cursor = getContentResolver().query(uri, null, selection, selectionArgs, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int latitudIndex = cursor.getColumnIndex("latitud");
+            int longitudIndex = cursor.getColumnIndex("longitud");
+            int nombreSedeIndex = cursor.getColumnIndex("nombre_sede");
+
+            if (latitudIndex != -1 && longitudIndex != -1 && nombreSedeIndex != -1) {
+                double latitud = cursor.getDouble(latitudIndex);
+                double longitud = cursor.getDouble(longitudIndex);
+                String nombreSede = cursor.getString(nombreSedeIndex);
+
+                GeoPoint empresaPoint = new GeoPoint(latitud, longitud);
+                mapController.setCenter(empresaPoint);
+                mapController.setZoom(4.0);
+
+                mapView.getOverlays().clear();
+
+                Marker marker = new Marker(mapView);
+                marker.setPosition(empresaPoint);
+
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+
+                mapView.getOverlays().add(marker);
+                marker.setTitle(ticker + " - " + nombreSede);
+                marker.setSnippet(getString(R.string.sede_empresa));
+                mapView.getOverlays().add(marker);
+                mapView.invalidate();
+
+                Log.d("MapView", "Ubicación cargada para " + ticker + ": " + latitud + ", " + longitud);
+            }
+            cursor.close();
+        } else {
+            GeoPoint defaultPoint = new GeoPoint(40.416775, -3.703790);
+            mapController.setCenter(defaultPoint);
+
+            Marker marker = new Marker(mapView);
+            marker.setPosition(defaultPoint);
+            marker.setTitle(getString(R.string.sede_empresa));
+            mapView.getOverlays().add(marker);
+            mapView.invalidate();
+
+            Log.d("MapView", "No se encontró ubicación para " + ticker + ", usando ubicación predeterminada");
+        }
     }
 
     @Override
@@ -372,6 +418,12 @@ public class InfoStock extends AppCompatActivity {
         super.onPause();
         guardarNotas();
         mapView.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mapView.onResume();
     }
 
 
