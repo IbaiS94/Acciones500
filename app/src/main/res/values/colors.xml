@@ -2,6 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="azul_clarito">#1C64A6</color>
     <color name="azul_600">#1E88E5</color>
     <color name="azul_800">#1565C0</color>
     <color name="gris_azulado_200">#B0BEC5</color>
@@ -24,4 +25,10 @@
     <color name="widget_texto_precio">#FF4CAF50</color>
     <color name="widget_texto_fecha">#FF607D8B</color>
 
+
+
+
+    <color name="mensaje_enviado_background">#0078FF</color>
+    <color name="mensaje_recibido_background">#EFEFEF</color>
+    <color name="nombre_remitente">#3F51B5</color>
 </resources>

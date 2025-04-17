@@ -3,6 +3,9 @@ package com.ibaisologuestoa.acciones500;
 import static com.ibaisologuestoa.acciones500.MainActivity.PREFS;
 import static com.ibaisologuestoa.acciones500.MainActivity.TEMA;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
@@ -15,7 +18,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -27,25 +32,32 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.mlkit.common.model.DownloadConditions;
 import com.google.mlkit.nl.translate.TranslateLanguage;
 import com.google.mlkit.nl.translate.Translation;
 import com.google.mlkit.nl.translate.Translator;
 import com.google.mlkit.nl.translate.TranslatorOptions;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -57,10 +69,19 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class InfoStock extends AppCompatActivity {
-    String nombre = null;
+    private static final String TAG = "InfoStock";
+    private static final String CHANNEL_ID = "chat_notifications";
+
+    private String nombre;
     private EditText notasEditText;
     private String NOM_ARCHIVO;
     private DrawerLayout dr;
@@ -68,6 +89,14 @@ public class InfoStock extends AppCompatActivity {
     private Translator traductor;
     private MapView mapView;
     private IMapController mapController;
+    private RecyclerView recyclerMensajes;
+    private ChatAdapter chatAdapter;
+    private EditText etMensaje;
+    private String usuarioActual;
+    private String currentToken;
+    private Handler handler = new Handler();
+    private static final long INTERVALO_ACTUALIZACION = 3000; // 3 segundos
+    private boolean chatVisible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +139,7 @@ public class InfoStock extends AppCompatActivity {
             SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
             String emailus = prefs.getString("currentUser", "");
             String nombreus = prefs.getString("currentUserName", "");
-            String clave = "imagen_" + emailus;
+            String clave = "imagen" + emailus;
             String imgGuardada = prefs.getString(clave, null);
 
             ImageView imgV = nav_perfil.findViewById(R.id.imgPerfil);
@@ -179,16 +208,244 @@ public class InfoStock extends AppCompatActivity {
                 return false;
             });
         }
+
         aplicarIdioma();
+        inicializarChat();
+        setupFCM();
+        createNotificationChannel();
+
+        if (getIntent().getBooleanExtra("abrirChat", false)) {
+            findViewById(R.id.chat_container).setVisibility(View.VISIBLE);
+            cargarMensajes();
+        }
     }
 
+    private void setupFCM() {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        currentToken = task.getResult();
+                        enviarTokenAlServidor(currentToken);
+                        suscribirATopicos();
+                    } else {
+                        Log.e(TAG, "Error obteniendo token FCM: ", task.getException());
+                    }
+                });
+    }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (!isChangingConfigurations() && traductor != null) {
-            traductor.close();
+    private void suscribirATopicos() {
+        FirebaseMessaging.getInstance().subscribeToTopic("stock_" + nombre)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Suscrito correctamente a stock_" + nombre);
+                    } else {
+                        Log.e(TAG, "Error en suscripción a tópico: ", task.getException());
+                    }
+                });
+    }
+
+    private void createNotificationChannel() {
+        NotificationChannel channel = new NotificationChannel(
+                CHANNEL_ID,
+                "Chat de Acciones",
+                NotificationManager.IMPORTANCE_DEFAULT);
+        channel.setDescription("Notificaciones del chat de acciones");
+
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
+    }
+
+    public static void mostrarNotificacion(Context context, String ticker, String mensaje, String remitente) {
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Intent intent = new Intent(context, InfoStock.class);
+        intent.putExtra("nombre", ticker);
+        intent.putExtra("abrirChat", true);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                context,
+                ticker.hashCode(),
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.chat)
+                .setContentTitle(context.getString(R.string.nuevo_mensaje) + " " + ticker)
+                .setContentText(remitente + ": " + mensaje)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder.setChannelId(CHANNEL_ID);
         }
+
+        notificationManager.notify(ticker.hashCode(), builder.build());
+    }
+
+    private void enviarTokenAlServidor(String token) {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://ec2-51-44-167-78.eu-west-3.compute.amazonaws.com/isologuestoa001/WEB/registrar_token.php");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoOutput(true);
+
+                SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                String email = prefs.getString("currentUser", "");
+
+                String parametros = "token=" + URLEncoder.encode(token, "UTF-8") +
+                        "&email=" + URLEncoder.encode(email, "UTF-8");
+
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write(parametros.getBytes("UTF-8"));
+                }
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    Log.d(TAG, "Token actualizado en servidor");
+                } else {
+                    Log.e(TAG, "Error HTTP: " + responseCode);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error en registro de token: ", e);
+            }
+        }).start();
+    }
+
+    private void inicializarChat() {
+        recyclerMensajes = findViewById(R.id.recycler_mensajes);
+        etMensaje = findViewById(R.id.et_mensaje);
+
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        usuarioActual = prefs.getString("currentUserName", "Usuario");
+
+        recyclerMensajes.setLayoutManager(new LinearLayoutManager(this));
+        chatAdapter = new ChatAdapter(this, usuarioActual);
+        recyclerMensajes.setAdapter(chatAdapter);
+
+        findViewById(R.id.btn_enviar).setOnClickListener(v -> {
+            if (!etMensaje.getText().toString().trim().isEmpty()) {
+                enviarMensaje();
+            }
+        });
+
+        findViewById(R.id.btn_cerrar_chat).setOnClickListener(v -> {
+            findViewById(R.id.chat_container).setVisibility(View.GONE);
+            chatVisible = false;
+        });
+
+        findViewById(R.id.fab_chat).setOnClickListener(v -> {
+            findViewById(R.id.chat_container).setVisibility(View.VISIBLE);
+            cargarMensajes();
+            chatVisible = true;
+        });
+    }
+
+    private void cargarMensajes() {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://ec2-51-44-167-78.eu-west-3.compute.amazonaws.com/isologuestoa001/WEB/obtener_mensajes.php");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoOutput(true);
+
+                String parametros = "ticker=" + URLEncoder.encode(nombre, "UTF-8");
+
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write(parametros.getBytes("UTF-8"));
+                }
+
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(conn.getInputStream(), "UTF-8"));
+
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+
+                JSONArray jsonArray = new JSONArray(response.toString());
+                List<Mensaje> mensajes = new ArrayList<>();
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject obj = jsonArray.getJSONObject(i);
+                    mensajes.add(new Mensaje(
+                            obj.getInt("id"),
+                            obj.getString("mensaje"),
+                            obj.getString("remitente"),
+                            obj.getLong("timestamp")
+                    ));
+                }
+
+                runOnUiThread(() -> {
+                    if (chatAdapter.getItemCount() != mensajes.size()) {
+                        chatAdapter.setMensajes(mensajes);
+                        recyclerMensajes.scrollToPosition(mensajes.size() - 1);
+                    }
+                });
+
+            } catch (Exception e) {
+                Log.e(TAG, "Error cargando mensajes: ", e);
+                runOnUiThread(() ->
+                        Toast.makeText(this, "Error cargando mensajes", Toast.LENGTH_SHORT).show());
+            }
+        }).start();
+    }
+
+    private void enviarMensaje() {
+        String contenido = etMensaje.getText().toString().trim();
+        if (contenido.isEmpty()) return;
+
+        etMensaje.setText("");
+
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://ec2-51-44-167-78.eu-west-3.compute.amazonaws.com/isologuestoa001/WEB/enviar_mensaje.php");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoOutput(true);
+
+                String parametros = "ticker=" + URLEncoder.encode(nombre, "UTF-8") +
+                        "&mensaje=" + URLEncoder.encode(contenido, "UTF-8") +
+                        "&remitente=" + URLEncoder.encode(usuarioActual, "UTF-8");
+
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write(parametros.getBytes("UTF-8"));
+                }
+
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(conn.getInputStream(), "UTF-8"));
+
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+
+                JSONObject jsonResponse = new JSONObject(response.toString());
+                if (jsonResponse.getBoolean("success")) {
+                    Log.d("JSONENVIO", String.valueOf(jsonResponse.getInt("http_code")));
+                    Mensaje nuevo = new Mensaje(
+                            jsonResponse.getInt("id"),
+                            contenido,
+                            usuarioActual,
+                            jsonResponse.getLong("timestamp")
+                    );
+
+                    runOnUiThread(() -> {
+                        chatAdapter.agregarMensaje(nuevo);
+                        recyclerMensajes.smoothScrollToPosition(chatAdapter.getItemCount() - 1);
+                    });
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error enviando mensaje: ", e);
+                runOnUiThread(() ->
+                        Toast.makeText(this, "Error enviando mensaje", Toast.LENGTH_SHORT).show());
+            }
+        }).start();
     }
 
     public void gestionInfo(StockDB db2) {
@@ -209,16 +466,14 @@ public class InfoStock extends AppCompatActivity {
             if ((nombre != null && nombre.equals(nombreC)) || (nombreI != null && nombreI.equals(nombreC))) {
                 TextView name = findViewById(R.id.stockNom);
                 nombre = cursor.getString(1);
-                Log.d("Nombre InfoStock", nombre);
                 name.setText(nombre);
 
                 TextView desc = findViewById(R.id.stockDescrip);
                 SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
                 String idioma = prefs.getString("Idioma", "es");
-                TranslatorOptions options;
-                DownloadConditions conditions;
                 String txt = cursor.getString(2);
 
+                TranslatorOptions options;
                 switch (idioma) {
                     case "en":
                         options = new TranslatorOptions.Builder()
@@ -242,32 +497,21 @@ public class InfoStock extends AppCompatActivity {
                 }
 
                 traductor = Translation.getClient(options);
-                conditions = new DownloadConditions.Builder().build();
+                DownloadConditions conditions = new DownloadConditions.Builder().build();
 
                 traductor.downloadModelIfNeeded(conditions)
                         .addOnSuccessListener(unused -> {
                             if (isFinishing()) return;
                             traductor.translate(txt)
                                     .addOnSuccessListener(texto_traducido -> {
-                                        if (!isFinishing()) {
-                                            desc.setText(texto_traducido);
-                                            Log.d("Traductor", "Traducción exitosa: " + texto_traducido);
-                                        }
+                                        if (!isFinishing()) desc.setText(texto_traducido);
                                     })
-                                    .addOnFailureListener(e -> {
-                                        Log.e("Traductor", "Error traducción: " + e.getMessage());
-                                        desc.setText(txt);
-                                    });
+                                    .addOnFailureListener(e -> desc.setText(txt));
                         })
-                        .addOnFailureListener(e -> {
-                            Log.e("Traductor", "Error modelo: " + e.getMessage());
-                            desc.setText(txt);
-                        });
+                        .addOnFailureListener(e -> desc.setText(txt));
 
                 TextView prec = findViewById(R.id.stockPrecio);
-                String euro = cursor.getString(3) + " $";
-                Log.d("Precio", "Precio recuperado de la BD para " + nombre + ": " + euro);
-                prec.setText(euro);
+                prec.setText(cursor.getString(3) + " $");
 
                 TextView nota = findViewById(R.id.notas);
                 nota.setText(cursor.getString(4));
@@ -275,7 +519,6 @@ public class InfoStock extends AppCompatActivity {
                 TextView sim = findViewById(R.id.stockSimilar);
                 sim.setText(getString(R.string.relacionado) + " " + cursor.getString(5));
 
-                // Cargar la ubicación de la sede de la empresa usando ContentProvider
                 cargarUbicacionEmpresa(nombre);
             }
         }
@@ -287,163 +530,166 @@ public class InfoStock extends AppCompatActivity {
         }
 
         TextView tradingView = findViewById(R.id.tradingView);
-        tradingView.setClickable(true);
         tradingView.setOnClickListener(b -> {
-            Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.tradingview.tradingviewapp");
-            if (launchIntent != null) {
-                startActivity(launchIntent);
-            } else {
-                Intent playStoreIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("market://details?id=com.tradingview.tradingviewapp"));
-                startActivity(playStoreIntent);
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("market://details?id=com.tradingview.tradingviewapp")));
+            } catch (Exception e) {
+                startActivity(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://play.google.com/store/apps/details?id=com.tradingview.tradingviewapp")));
             }
         });
     }
 
     private void cargarUbicacionEmpresa(String ticker) {
         Uri uri = Uri.parse("content://com.ibaisologuestoa.acciones500.ubicacionesprovider/ubicaciones");
+        String[] projection = {"latitud", "longitud", "nombre_sede"};
         String selection = "ticker = ?";
         String[] selectionArgs = {ticker};
 
-        Cursor cursor = getContentResolver().query(uri, null, selection, selectionArgs, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int latitudIndex = cursor.getColumnIndex("latitud");
-            int longitudIndex = cursor.getColumnIndex("longitud");
-            int nombreSedeIndex = cursor.getColumnIndex("nombre_sede");
+        try (Cursor cursor = getContentResolver().query(uri, projection, selection, selectionArgs, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                double latitud = cursor.getDouble(0);
+                double longitud = cursor.getDouble(1);
+                String nombreSede = cursor.getString(2);
 
-            if (latitudIndex != -1 && longitudIndex != -1 && nombreSedeIndex != -1) {
-                double latitud = cursor.getDouble(latitudIndex);
-                double longitud = cursor.getDouble(longitudIndex);
-                String nombreSede = cursor.getString(nombreSedeIndex);
-
-                GeoPoint empresaPoint = new GeoPoint(latitud, longitud);
-                mapController.setCenter(empresaPoint);
-                mapController.setZoom(4.0);
+                GeoPoint punto = new GeoPoint(latitud, longitud);
+                mapController.setCenter(punto);
+                mapController.setZoom(15.0);
 
                 mapView.getOverlays().clear();
-
-                Marker marker = new Marker(mapView);
-                marker.setPosition(empresaPoint);
-
-                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-
-                mapView.getOverlays().add(marker);
-                marker.setTitle(ticker + " - " + nombreSede);
-                marker.setSnippet(getString(R.string.sede_empresa));
-                mapView.getOverlays().add(marker);
+                Marker marcador = new Marker(mapView);
+                marcador.setPosition(punto);
+                marcador.setTitle(nombreSede);
+                marcador.setSnippet(getString(R.string.sede_empresa));
+                mapView.getOverlays().add(marcador);
                 mapView.invalidate();
-
-                Log.d("MapView", "Ubicación cargada para " + ticker + ": " + latitud + ", " + longitud);
+            } else {
+                GeoPoint defaultPoint = new GeoPoint(40.416775, -3.703790);
+                mapController.setCenter(defaultPoint);
+                mapController.setZoom(10.0);
             }
-            cursor.close();
-        } else {
-            GeoPoint defaultPoint = new GeoPoint(40.416775, -3.703790);
-            mapController.setCenter(defaultPoint);
-
-            Marker marker = new Marker(mapView);
-            marker.setPosition(defaultPoint);
-            marker.setTitle(getString(R.string.sede_empresa));
-            mapView.getOverlays().add(marker);
-            mapView.invalidate();
-
-            Log.d("MapView", "No se encontró ubicación para " + ticker + ", usando ubicación predeterminada");
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        MenuItem boton = menu.findItem(R.id.action_tema);
-        boton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int esteMode = AppCompatDelegate.getDefaultNightMode();
-                boolean esDarkMode = esteMode != AppCompatDelegate.MODE_NIGHT_YES;
-                SharedPreferences preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putBoolean(TEMA, esDarkMode);
-                editor.apply();
-                AppCompatDelegate.setDefaultNightMode(
-                        esDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
-                );
-                recreate();
-                return true;
-            }
-        });
-
-        MenuItem boton2 = menu.findItem(R.id.action_search);
-        boton2.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Intent intent2 = new Intent(Intent.ACTION_WEB_SEARCH);
-                Log.d("Nombre 2", nombre);
-                intent2.putExtra(SearchManager.QUERY, getString(R.string.acc) + " " + nombre);
-                startActivity(intent2);
-                return true;
-            }
-        });
-        return true;
-    }
-
-    private void guardarNotas() {
-        String texto = "";
-        if (notasEditText != null) {
-            texto = notasEditText.getText().toString();
-        }
-        try (FileOutputStream fos = openFileOutput(NOM_ARCHIVO, Context.MODE_PRIVATE)) {
-            fos.write(texto.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
     private String leerNotas() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder contenido = new StringBuilder();
         try (FileInputStream fis = openFileInput(NOM_ARCHIVO);
              InputStreamReader isr = new InputStreamReader(fis);
              BufferedReader br = new BufferedReader(isr)) {
+
             String linea;
             while ((linea = br.readLine()) != null) {
-                sb.append(linea);
-                sb.append("\n");
+                contenido.append(linea).append("\n");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Log.e(TAG, "Error leyendo notas: ", e);
         }
-        return sb.toString();
+        return contenido.toString();
     }
 
+    private void guardarNotas() {
+        try (FileOutputStream fos = openFileOutput(NOM_ARCHIVO, Context.MODE_PRIVATE)) {
+            fos.write(notasEditText.getText().toString().getBytes());
+        } catch (Exception e) {
+            Log.e(TAG, "Error guardando notas: ", e);
+        }
+    }
+
+    private void aplicarIdioma() {
+        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+        String nuevoIdioma = prefs.getString("Idioma", "es");
+        String idiomaActual = Locale.getDefault().getLanguage();
+
+        if (nuevoIdioma.equals(idiomaActual)) {
+            return;
+        }
+
+        Locale locale = new Locale(nuevoIdioma);
+        Locale.setDefault(locale);
+        Resources res = getResources();
+        Configuration config = res.getConfiguration();
+        config.setLocale(locale);
+        config.setLayoutDirection(locale);
+        res.updateConfiguration(config, res.getDisplayMetrics());
+
+        if (!isFinishing()) {
+            recreate();
+        }
+    }
     @Override
-    protected void onPause() {
-        super.onPause();
-        guardarNotas();
-        mapView.onPause();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+
+        MenuItem temaItem = menu.findItem(R.id.action_tema);
+        temaItem.setOnMenuItemClickListener(item -> {
+            int currentMode = AppCompatDelegate.getDefaultNightMode();
+            boolean nuevoModo = currentMode != AppCompatDelegate.MODE_NIGHT_YES;
+
+            AppCompatDelegate.setDefaultNightMode(
+                    nuevoModo ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+
+            getSharedPreferences(PREFS, MODE_PRIVATE)
+                    .edit()
+                    .putBoolean(TEMA, nuevoModo)
+                    .apply();
+
+            recreate();
+            return true;
+        });
+
+        MenuItem buscarItem = menu.findItem(R.id.action_search);
+        buscarItem.setOnMenuItemClickListener(item -> {
+            Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+            intent.putExtra(SearchManager.QUERY, nombre + " stock");
+            startActivity(intent);
+            return true;
+        });
+
+        return true;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mapView.onResume();
+        if (currentToken != null) {
+            enviarTokenAlServidor(currentToken);
+        }
+        handler.post(actualizadorMensajes);
     }
 
-
-    private void aplicarIdioma() {
-        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
-        String nuevoIdioma = prefs.getString("Idioma", "es");
-        Configuration config = getResources().getConfiguration();
-        Locale currentLocale = config.locale;
-
-        if (currentLocale.getLanguage().equals(nuevoIdioma)) {
-            return;
-        }
-
-        Locale locale = new Locale(nuevoIdioma);
-        Locale.setDefault(locale);
-        config.setLocale(locale);
-        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
-
-        if (!isChangingConfigurations()) {
-            recreate();
-        }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mapView.onPause();
+        guardarNotas();
+        handler.removeCallbacks(actualizadorMensajes);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (traductor != null) {
+            // traductor.close();
+        }
+        //FirebaseMessaging.getInstance().unsubscribeFromTopic("stock_" + nombre);
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        aplicarIdioma();
+        recreate();
+    }
+
+    private Runnable actualizadorMensajes = new Runnable() {
+        @Override
+        public void run() {
+            if (chatVisible) {
+                cargarMensajes();
+            }
+            handler.postDelayed(this, INTERVALO_ACTUALIZACION);
+        }
+    };
 }

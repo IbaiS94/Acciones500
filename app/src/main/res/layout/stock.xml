@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/dr"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -214,8 +215,8 @@
                     android:id="@+id/chat_toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#4CAF50"
-                    app:title="Chat sobre stock"
+                    android:background="@color/azul_clarito"
+                    app:title="Chat"
                     app:titleTextColor="@android:color/white"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -252,11 +253,11 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:background="@android:drawable/editbox_background"
                         android:hint="Escribe un mensaje..."
                         android:inputType="textMultiLine"
                         android:maxLines="4"
-                        android:padding="8dp" />
+                        android:padding="8dp"
+                        />
 
                     <ImageButton
                         android:id="@+id/btn_enviar"
@@ -275,6 +276,7 @@
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav"
+        android:fitsSystemWindows="true"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"

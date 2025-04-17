@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "758306286525",
+    "project_id": "acciones500-1da7b",
+    "storage_bucket": "acciones500-1da7b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:758306286525:android:1cf78efce9195beeaac0d4",
+        "android_client_info": {
+          "package_name": "com.ibaisologuestoa.acciones500"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1A7VO5X_-6aMbZg7BY2OWsaXFT9zX8JQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
