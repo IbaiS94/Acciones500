@@ -20,4 +20,30 @@
     <string name="a">Thank you for trying my app</string>
     <string name="pulsa">Press the screen to continue ☝️</string>
     <string name="idim">🌍 LANGUAGES 🌍</string>
+    <string name="iniciar_sesion">Sign In</string>
+    <string name="registrarse">Register</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="nombre">Full Name</string>
+    <string name="confirmar_password">Confirm Password</string>
+    <string name="completar_registro">Complete Registration</string>
+    <string name="credenciales_invalidas">Invalid credentials</string>
+    <string name="registro_exitoso">Registration successful</string>
+    <string name="campos_obligatorios">All fields are required</string>
+    <string name="email_invalido">The email is not valid</string>
+    <string name="password_corto">Password must be at least 6 characters</string>
+    <string name="passwords_no_coinciden">Passwords do not match</string>
+    <string name="email_ya_registrado">This email is already registered</string>
+    <string name="bienvenido">Welcome, %s!</string>
+    <string name="logeado_como">Logged in as: %s</string>
+    <string name="cerrar_sesion">Log Out</string>
+    <string name="foto_usuario">Select profile picture</string>
+    <string name="selecciona_accion_widget">Select an action for the widget</string>
+    <string name="configurar">Configure</string>
+    <string name="refresh">Refresh</string>
+    <string name="alertas">Alerts</string>
+    <string name="alerta_mercados">Market opening alert</string>
+    <string name="sede_empresa">Company headquarters</string>
+    <string name="nuevo_mensaje">New message: </string>
+
 </resources>

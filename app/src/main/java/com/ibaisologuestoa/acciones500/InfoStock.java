@@ -3,6 +3,7 @@ package com.ibaisologuestoa.acciones500;
 import static com.ibaisologuestoa.acciones500.MainActivity.PREFS;
 import static com.ibaisologuestoa.acciones500.MainActivity.TEMA;
 
+import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,12 +12,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +31,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +40,9 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
@@ -47,6 +52,8 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -80,6 +87,7 @@ import java.util.Locale;
 public class InfoStock extends AppCompatActivity {
     private static final String TAG = "InfoStock";
     private static final String CHANNEL_ID = "chat_notifications";
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
 
     private String nombre;
     private EditText notasEditText;
@@ -97,11 +105,14 @@ public class InfoStock extends AppCompatActivity {
     private Handler handler = new Handler();
     private static final long INTERVALO_ACTUALIZACION = 3000; // 3 segundos
     private boolean chatVisible = false;
+    private FusedLocationProviderClient fusedLocationClient;
+    private TextView tvDistancia;
+    private Switch switchNotificaciones;
+    private double latitudSede, longitudSede;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        aplicarIdioma();
         Context ctx = getApplicationContext();
         org.osmdroid.config.Configuration.getInstance().load(ctx,
                 PreferenceManager.getDefaultSharedPreferences(ctx));
@@ -119,10 +130,14 @@ public class InfoStock extends AppCompatActivity {
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         mapView.setMultiTouchControls(true);
         mapController = mapView.getController();
-        mapController.setZoom(6.0);
 
         Toolbar toolbar = findViewById(R.id.barra_menu);
         setSupportActionBar(toolbar);
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        tvDistancia = findViewById(R.id.tv_distancia);
+        switchNotificaciones = findViewById(R.id.switch_notificaciones);
+
 
         gestionInfo(null);
 
@@ -213,11 +228,55 @@ public class InfoStock extends AppCompatActivity {
         inicializarChat();
         setupFCM();
         createNotificationChannel();
+        configurarNotificaciones();
 
         if (getIntent().getBooleanExtra("abrirChat", false)) {
-            findViewById(R.id.chat_container).setVisibility(View.VISIBLE);
+            findViewById(R.id.chat_cont).setVisibility(View.VISIBLE);
             cargarMensajes();
         }
+    }
+
+    private void configurarNotificaciones() {
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        boolean suscrito = prefs.getBoolean("suscrito_" + nombre, false);
+        switchNotificaciones.setChecked(suscrito);
+        switchNotificaciones.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                suscribirATopico();
+            } else {
+                desuscribirDeTopico();
+            }
+        });
+    }
+
+    private void suscribirATopico() {
+        FirebaseMessaging.getInstance().subscribeToTopic("stock_" + nombre)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Suscrito a stock_" + nombre);
+                        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                        prefs.edit().putBoolean("suscrito_" + nombre, true).apply();
+                        Toast.makeText(this, "Suscrito a notificaciones de " + nombre, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.e(TAG, "Error al suscribirse: ", task.getException());
+                        Toast.makeText(this, "Error al suscribirse", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void desuscribirDeTopico() {
+        FirebaseMessaging.getInstance().unsubscribeFromTopic("stock_" + nombre)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Desuscrito de stock_" + nombre);
+                        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                        prefs.edit().putBoolean("suscrito_" + nombre, false).apply();
+                        Toast.makeText(this, "Desuscrito de notificaciones de " + nombre, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.e(TAG, "Error al desuscribirse: ", task.getException());
+                        Toast.makeText(this, "Error al desuscribirse", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void setupFCM() {
@@ -226,20 +285,8 @@ public class InfoStock extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         currentToken = task.getResult();
                         enviarTokenAlServidor(currentToken);
-                        suscribirATopicos();
                     } else {
                         Log.e(TAG, "Error obteniendo token FCM: ", task.getException());
-                    }
-                });
-    }
-
-    private void suscribirATopicos() {
-        FirebaseMessaging.getInstance().subscribeToTopic("stock_" + nombre)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d(TAG, "Suscrito correctamente a stock_" + nombre);
-                    } else {
-                        Log.e(TAG, "Error en suscripción a tópico: ", task.getException());
                     }
                 });
     }
@@ -333,12 +380,12 @@ public class InfoStock extends AppCompatActivity {
         });
 
         findViewById(R.id.btn_cerrar_chat).setOnClickListener(v -> {
-            findViewById(R.id.chat_container).setVisibility(View.GONE);
+            findViewById(R.id.chat_cont).setVisibility(View.GONE);
             chatVisible = false;
         });
 
         findViewById(R.id.fab_chat).setOnClickListener(v -> {
-            findViewById(R.id.chat_container).setVisibility(View.VISIBLE);
+            findViewById(R.id.chat_cont).setVisibility(View.VISIBLE);
             cargarMensajes();
             chatVisible = true;
         });
@@ -549,13 +596,13 @@ public class InfoStock extends AppCompatActivity {
 
         try (Cursor cursor = getContentResolver().query(uri, projection, selection, selectionArgs, null)) {
             if (cursor != null && cursor.moveToFirst()) {
-                double latitud = cursor.getDouble(0);
-                double longitud = cursor.getDouble(1);
+                latitudSede = cursor.getDouble(0);
+                longitudSede = cursor.getDouble(1);
                 String nombreSede = cursor.getString(2);
 
-                GeoPoint punto = new GeoPoint(latitud, longitud);
+                GeoPoint punto = new GeoPoint(latitudSede, longitudSede);
                 mapController.setCenter(punto);
-                mapController.setZoom(15.0);
+                mapController.setZoom(3.0);
 
                 mapView.getOverlays().clear();
                 Marker marcador = new Marker(mapView);
@@ -564,10 +611,65 @@ public class InfoStock extends AppCompatActivity {
                 marcador.setSnippet(getString(R.string.sede_empresa));
                 mapView.getOverlays().add(marcador);
                 mapView.invalidate();
+
+                obtenerUbicacionActual();
             } else {
                 GeoPoint defaultPoint = new GeoPoint(40.416775, -3.703790);
                 mapController.setCenter(defaultPoint);
-                mapController.setZoom(10.0);
+                tvDistancia.setText("Distancia a la sede: No disponible");
+            }
+        }
+    }
+
+    private void obtenerUbicacionActual() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+            return;
+        }
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, location -> {
+                    if (location != null) {
+                        double latitudUsuario = location.getLatitude();
+                        double longitudUsuario = location.getLongitude();
+
+                        float[] results = new float[1];
+                        Location.distanceBetween(latitudUsuario, longitudUsuario,
+                                latitudSede, longitudSede, results);
+                        float distancia = results[0] / 1000; // en kilómetros
+                        tvDistancia.setText(String.format("Distancia a la sede: %.2f km", distancia));
+
+                        GeoPoint puntoUsuario = new GeoPoint(latitudUsuario, longitudUsuario);
+                        Marker marcadorUsuario = new Marker(mapView);
+                        marcadorUsuario.setPosition(puntoUsuario);
+                        marcadorUsuario.setTitle("Tú estás aquí");
+                        marcadorUsuario.setIcon(
+                                ContextCompat.getDrawable(this, R.drawable.ubi)
+                        );
+                        mapView.getOverlays().add(marcadorUsuario);
+
+                        mapView.invalidate();
+                    } else {
+                        tvDistancia.setText("Distancia a la sede: No disponible");
+                    }
+                })
+                .addOnFailureListener(this, e -> {
+                    Log.e(TAG, "Error obteniendo ubicación: ", e);
+                    tvDistancia.setText("Distancia a la sede: Error");
+                });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                obtenerUbicacionActual();
+            } else {
+                tvDistancia.setText("Distancia a la sede: Permiso denegado");
             }
         }
     }
@@ -617,6 +719,7 @@ public class InfoStock extends AppCompatActivity {
             recreate();
         }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
@@ -673,7 +776,6 @@ public class InfoStock extends AppCompatActivity {
         if (traductor != null) {
             // traductor.close();
         }
-        //FirebaseMessaging.getInstance().unsubscribeFromTopic("stock_" + nombre);
     }
 
     @Override

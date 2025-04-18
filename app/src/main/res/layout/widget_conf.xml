@@ -11,10 +11,11 @@
         android:layout_height="wrap_content"
         app:cardCornerRadius="12dp"
         app:cardElevation="4dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:cardUseCompatPadding="true">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,34 +26,34 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:text="@string/selecciona_accion_widget"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="16dp"/>
+                android:textStyle="bold" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
                 app:cardCornerRadius="8dp"
-                app:cardElevation="2dp"
-                android:layout_marginBottom="24dp">
+                app:cardElevation="2dp">
 
                 <Spinner
                     android:id="@+id/spinner_acciones_widget"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:background="@android:color/transparent"/>
+                    android:background="@android:color/transparent"
+                    android:padding="8dp" />
             </androidx.cardview.widget.CardView>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/boton_configurar_widget"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/configurar"
-                app:cornerRadius="8dp"
                 android:padding="12dp"
-                android:textSize="16sp" />
+                android:text="@string/configurar"
+                android:textSize="16sp"
+                app:cornerRadius="8dp" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

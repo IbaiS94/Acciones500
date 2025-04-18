@@ -20,4 +20,30 @@
     <string name="a">Danke, dass Sie meine App ausprobieren</string>
     <string name="pulsa">Drücken Sie auf den Bildschirm, um fortzufahren ☝️</string>
     <string name="idim">🌍 SPRACHEN 🌍</string>
+    <string name="iniciar_sesion">Anmelden</string>
+    <string name="registrarse">Registrieren</string>
+    <string name="email">E-Mail</string>
+    <string name="password">Passwort</string>
+    <string name="nombre">Vollständiger Name</string>
+    <string name="confirmar_password">Passwort bestätigen</string>
+    <string name="completar_registro">Registrierung abschließen</string>
+    <string name="credenciales_invalidas">Ungültige Anmeldedaten</string>
+    <string name="registro_exitoso">Registrierung erfolgreich</string>
+    <string name="campos_obligatorios">Alle Felder sind erforderlich</string>
+    <string name="email_invalido">Die E-Mail-Adresse ist ungültig</string>
+    <string name="password_corto">Das Passwort muss mindestens 6 Zeichen lang sein</string>
+    <string name="passwords_no_coinciden">Passwörter stimmen nicht überein</string>
+    <string name="email_ya_registrado">Diese E-Mail ist bereits registriert</string>
+    <string name="bienvenido">Willkommen, %s!</string>
+    <string name="logeado_como">Angemeldet als: %s</string>
+    <string name="cerrar_sesion">Abmelden</string>
+    <string name="foto_usuario">Profilbild auswählen</string>
+    <string name="selecciona_accion_widget">Aktion für das Widget auswählen</string>
+    <string name="configurar">Konfigurieren</string>
+    <string name="refresh">Aktualisieren</string>
+    <string name="alertas">Benachrichtigungen</string>
+    <string name="alerta_mercados">Marktöffnungswarnung</string>
+    <string name="sede_empresa">Firmensitz</string>
+    <string name="nuevo_mensaje">Neue Nachricht: </string>
+
 </resources>

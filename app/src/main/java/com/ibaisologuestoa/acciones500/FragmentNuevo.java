@@ -114,7 +114,7 @@ public class FragmentNuevo extends Fragment {
                             .addOnSuccessListener(unused ->
                                     traductor.translate(txt)
                                             .addOnSuccessListener(translatedText -> {
-                                                if (isAdded()) { // Verificar que el fragment está adjunto
+                                                if (isAdded()) {
                                                     descTextView.setText(translatedText);
                                                     Log.d("FragmentTraducción", "Traducción exitosa");
                                                 }

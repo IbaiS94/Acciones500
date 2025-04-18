@@ -16,6 +16,7 @@ constraintlayout = "2.2.0"
 compiler = "3.2.0-alpha11"
 materialVersion = "1.11.0"
 osmdroidAndroid = "6.1.16"
+playServicesLocation = "21.3.0"
 preference = "1.2.1"
 retrofit = "2.9.0"
 slf4jApi = "1.7.32"
@@ -48,6 +49,7 @@ osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "os
 osmdroid-geopackage = { module = "org.osmdroid:osmdroid-geopackage", version.ref = "osmdroidAndroid" }
 osmdroid-mapsforge = { module = "org.osmdroid:osmdroid-mapsforge", version.ref = "osmdroidAndroid" }
 osmdroid-wms = { module = "org.osmdroid:osmdroid-wms", version.ref = "osmdroidAndroid" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 preference = { module = "androidx.preference:preference", version.ref = "preference" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4jApi" }

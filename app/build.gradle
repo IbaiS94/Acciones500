@@ -57,5 +57,5 @@ dependencies {
     }
     implementation libs.firebase.messaging
     implementation platform(libs.firebase.bom)
-
+    implementation libs.play.services.location
 }

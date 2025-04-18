@@ -9,6 +9,7 @@
     android:background="@color/material_dynamic_neutral30">
 
     <TextView
+        android:layout_marginTop="20dp"
         android:id="@+id/creditos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

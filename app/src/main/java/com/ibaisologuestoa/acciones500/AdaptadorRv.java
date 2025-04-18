@@ -75,25 +75,35 @@ public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> 
             favBot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("Debug", String.valueOf(favBot));
+                    // Captura la posición antes de mostrar el diálogo
+                    final int position = getAdapterPosition();
+                    if (position == RecyclerView.NO_POSITION) return;
+                    Log.d("AdaptadorRv", "Favorito clicked position=" + position);
+
                     new MaterialAlertDialogBuilder(itemView.getContext())
                             .setTitle(R.string.conf)
                             .setMessage(R.string.conf3)
                             .setPositiveButton(R.string.si, new DialogInterface.OnClickListener() {
+                                @Override
                                 public void onClick(DialogInterface dialog, int which) {
+                                    StockDB dbHelper = new StockDB(itemView.getContext());
+                                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                    boolean nowFav;
                                     if (!"fav".equals(favBot.getTag())) {
                                         favBot.setImageResource(R.drawable.star2);
                                         favBot.setTag("fav");
-                                        StockDB t = new StockDB(itemView.getContext());
-                                        SQLiteDatabase db = t.getWritableDatabase();
-                                        t.actualizar(db, listaItems.get(getAdapterPosition()).nombre, Boolean.TRUE);
+                                        nowFav = true;
                                     } else {
                                         favBot.setImageResource(R.drawable.star);
                                         favBot.setTag("fav_no");
-                                        StockDB t = new StockDB(itemView.getContext());
-                                        SQLiteDatabase db = t.getWritableDatabase();
-                                        t.actualizar(db, listaItems.get(getAdapterPosition()).nombre, Boolean.FALSE);
+                                        nowFav = false;
                                     }
+                                    // Actualiza la base de datos
+                                    StockItem currentItem = listaItems.get(position);
+                                    dbHelper.actualizar(db, currentItem.nombre, nowFav);
+                                    db.close();
+                                    // Refresca el item
+                                    notifyItemChanged(position);
                                 }
                             })
                             .setNegativeButton(R.string.no, null)
@@ -104,13 +114,13 @@ public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> 
 
         @Override
         public void onClick(View v) {
-            int posicion = getAdapterPosition();
-            if (posicion != RecyclerView.NO_POSITION) {
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
                 View containerNuevo = ((Activity) context).findViewById(R.id.container_nuevo);
                 if (containerNuevo != null) {
                     FragmentNuevo fragment = new FragmentNuevo();
                     Bundle args = new Bundle();
-                    args.putString("nombre", listaItems.get(posicion).nombre);
+                    args.putString("nombre", listaItems.get(position).nombre);
                     fragment.setArguments(args);
                     ((AppCompatActivity) context).getSupportFragmentManager()
                             .beginTransaction()
@@ -118,7 +128,7 @@ public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> 
                             .commit();
                 } else {
                     Intent intent = new Intent(context, InfoStock.class);
-                    intent.putExtra("nombre", listaItems.get(posicion).nombre);
+                    intent.putExtra("nombre", listaItems.get(position).nombre);
                     context.startActivity(intent);
                 }
             }

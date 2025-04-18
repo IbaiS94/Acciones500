@@ -20,7 +20,6 @@
     <string name="a">"¡Gracias por descargar!"</string>
     <string name="pulsa">"Bienvenido de vuelta, pulsa para continuar ☝️"</string>
     <string name="idim">"🌍 IDIOMAS 🌍"</string>
-    <!-- Cadenas para inicio de sesión y registro -->
     <string name="iniciar_sesion">Iniciar Sesión</string>
     <string name="registrarse">Registrarse</string>
     <string name="email">Correo electrónico</string>

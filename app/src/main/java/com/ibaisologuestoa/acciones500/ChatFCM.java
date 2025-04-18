@@ -11,7 +11,6 @@ import com.google.firebase.messaging.RemoteMessage;
 public class ChatFCM extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
-        Log.d("GSDGSFDH", "agagag");
         String ticker = remoteMessage.getData().get("ticker");
             String mensaje = remoteMessage.getData().get("mensaje");
             String remitente = remoteMessage.getData().get("remitente");

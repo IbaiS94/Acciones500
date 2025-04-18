@@ -41,36 +41,28 @@ public class Widget extends AppWidgetProvider {
         RemoteViews vistas = new RemoteViews(contexto.getPackageName(), R.layout.widget);
         vistas.setTextViewText(R.id.widget_nom, nombreAccion);
         vistas.setTextViewText(R.id.widget_precio, String.format("$%.2f", precioAccion));
-
         int colorTextoNombre = contexto.getResources().getColor(R.color.widget_texto_nombre, contexto.getTheme());
         int colorTextoPrecio = contexto.getResources().getColor(R.color.widget_texto_precio, contexto.getTheme());
         int colorTextoFecha = contexto.getResources().getColor(R.color.widget_texto_fecha, contexto.getTheme());
-
         vistas.setTextColor(R.id.widget_nom, colorTextoNombre);
         vistas.setTextColor(R.id.widget_precio, colorTextoPrecio);
         vistas.setTextColor(R.id.widget_fecha, colorTextoFecha);
-
         Calendar cal = Calendar.getInstance(TimeZone.getDefault());
-        String t = String.format("%02d:%02d:%02d",
-                cal.get(Calendar.HOUR_OF_DAY),
-                cal.get(Calendar.MINUTE),
-                cal.get(Calendar.SECOND));
+        String t = String.format("%02d:%02d:%02d", cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
         vistas.setTextViewText(R.id.widget_fecha, "Actualizado: " + t);
-
         int colorFondo = contexto.getResources().getColor(R.color.widget_fondo, contexto.getTheme());
         vistas.setInt(R.id.widget_layout, "setBackgroundColor", colorFondo);
-
         Intent intentLanzar = new Intent(contexto, Saludo.class);
-        PendingIntent intentoLanzar = PendingIntent.getActivity(
-                contexto, 0, intentLanzar, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent intentoLanzar = PendingIntent.getActivity(contexto, 0, intentLanzar, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         vistas.setOnClickPendingIntent(R.id.widget_layout, intentoLanzar);
-
         Intent intentRefrescar = new Intent(contexto, Widget.class);
         intentRefrescar.setAction(ACCION_REFRESCAR);
         intentRefrescar.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, idWidget);
-        PendingIntent intentoRefrescar = PendingIntent.getBroadcast(
-                contexto, idWidget, intentRefrescar, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent intentoRefrescar = PendingIntent.getBroadcast(contexto, idWidget, intentRefrescar, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         vistas.setOnClickPendingIntent(R.id.widget_refresh, intentoRefrescar);
+
+
+
 
         gestorWidgets.updateAppWidget(idWidget, vistas);
     }

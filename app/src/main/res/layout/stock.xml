@@ -88,6 +88,7 @@
                         android:textSize="30sp"
                         android:textStyle="bold" />
                 </androidx.cardview.widget.CardView>
+
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="220dp"
@@ -95,10 +96,28 @@
                     android:layout_marginBottom="8dp"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="4dp">
+
                     <org.osmdroid.views.MapView
                         android:id="@+id/map"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"/>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="8dp"
+                    android:layout_marginBottom="8dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp">
+
+                    <TextView
+                        android:id="@+id/tv_distancia"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp"
+                        android:text="Distancia a la sede: Calculando..."
+                        android:textSize="18sp" />
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
@@ -194,7 +213,7 @@
             app:backgroundTint="#1591EA"/>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/chat_container"
+            android:id="@+id/chat_cont"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_margin="16dp"
@@ -237,8 +256,25 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:padding="8dp"
-                    app:layout_constraintBottom_toTopOf="@id/layout_enviar_mensaje"
+                    app:layout_constraintBottom_toTopOf="@id/notificaciones_layout"
                     app:layout_constraintTop_toBottomOf="@id/chat_toolbar" />
+
+                <LinearLayout
+                    android:id="@+id/notificaciones_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp"
+                    android:background="#F5F5F5"
+                    app:layout_constraintBottom_toTopOf="@id/layout_enviar_mensaje">
+
+                    <Switch
+                        android:id="@+id/switch_notificaciones"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Activar notificaciones para este stock"
+                        android:padding="8dp"/>
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/layout_enviar_mensaje"
@@ -256,8 +292,7 @@
                         android:hint="Escribe un mensaje..."
                         android:inputType="textMultiLine"
                         android:maxLines="4"
-                        android:padding="8dp"
-                        />
+                        android:padding="8dp" />
 
                     <ImageButton
                         android:id="@+id/btn_enviar"
