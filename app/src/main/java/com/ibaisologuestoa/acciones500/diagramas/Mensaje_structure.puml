@@ -1,0 +1,250 @@
+@startuml
+
+/' diagram meta data start
+config=StructureConfiguration;
+{
+  "projectClassification": {
+    "searchMode": "OpenProject", // OpenProject, AllProjects
+    "includedProjects": "",
+    "pathEndKeywords": "*.impl",
+    "isClientPath": "",
+    "isClientName": "",
+    "isTestPath": "",
+    "isTestName": "",
+    "isMappingPath": "",
+    "isMappingName": "",
+    "isDataAccessPath": "",
+    "isDataAccessName": "",
+    "isDataStructurePath": "",
+    "isDataStructureName": "",
+    "isInterfaceStructuresPath": "",
+    "isInterfaceStructuresName": "",
+    "isEntryPointPath": "",
+    "isEntryPointName": "",
+    "treatFinalFieldsAsMandatory": false
+  },
+  "graphRestriction": {
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "removeByInheritance": "", // inheritance/annotation based filtering is done in a second step
+    "removeByAnnotation": "",
+    "removeByClassPackage": "", // cleanup the graph after inheritance/annotation based filtering is done
+    "removeByClassName": "",
+    "cutMappings": false,
+    "cutEnum": true,
+    "cutTests": true,
+    "cutClient": true,
+    "cutDataAccess": false,
+    "cutInterfaceStructures": false,
+    "cutDataStructures": false,
+    "cutGetterAndSetter": true,
+    "cutConstructors": true
+  },
+  "graphTraversal": {
+    "forwardDepth": 6,
+    "backwardDepth": 6,
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "hideMappings": false,
+    "hideDataStructures": false,
+    "hidePrivateMethods": true,
+    "hideInterfaceCalls": true, // indirection: implementation -> interface (is hidden) -> implementation
+    "onlyShowApplicationEntryPoints": false, // root node is included
+    "useMethodCallsForStructureDiagram": "ForwardOnly" // ForwardOnly, BothDirections, No
+  },
+  "details": {
+    "aggregation": "GroupByClass", // ByClass, GroupByClass, None
+    "showClassGenericTypes": true,
+    "showMethods": true,
+    "showMethodParameterNames": true,
+    "showMethodParameterTypes": true,
+    "showMethodReturnType": true,
+    "showPackageLevels": 2,
+    "showDetailedClassStructure": true
+  },
+  "rootClass": "com.ibaisologuestoa.acciones500.Mensaje",
+  "extensionCallbackMethod": "" // qualified.class.name#methodName - signature: public static String method(String)
+}
+diagram meta data end '/
+
+
+
+digraph g {
+    rankdir="TB"
+    splines=polyline
+    
+
+'nodes 
+subgraph cluster_1435227722 { 
+   	label=ibaisologuestoa
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   subgraph cluster_1099670436 { 
+   	label=acciones500
+	labeljust=l
+	fillcolor="#d8d8d8"
+	style=filled
+   
+   ChatAdapter68430481[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)ChatAdapter</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   context: Context [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   formatoHora: SimpleDateFormat [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   mensajes: List&lt;Mensaje&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   usuarioActual: String [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ agregarMensaje(mensaje: Mensaje)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getItemViewType(position: int): int</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onBindViewHolder(holder: MensajeViewHolder, position: int)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onCreateViewHolder(parent: ViewGroup, viewType: int): MensajeViewHolder</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+FragmentNuevo68430481[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)FragmentNuevo</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   NOM_ARCHIVO: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   actualizadorMensajes: Runnable [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   chatAdapter: ChatAdapter [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   chatVisible: boolean [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   currentToken: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   etMensaje: EditText [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   fusedLocationClient: FusedLocationProviderClient [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   handler: Handler [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   latitudSede: double [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   listener: OnNombreActualizadoListener [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   longitudSede: double [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   mapController: IMapController [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   mapView: MapView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   nombre: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   notasEditText: EditText [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   recyclerMensajes: RecyclerView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   switchNotificaciones: Switch [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   traductor: Translator [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   tvDistancia: TextView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   usuarioActual: String [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >- cargarMensajes()</TD></TR>
+<TR><TD ALIGN="LEFT" >- cargarUbicacionEmpresa(ticker: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >- configurarNotificaciones()</TD></TR>
+<TR><TD ALIGN="LEFT" >- createNotificationChannel()</TD></TR>
+<TR><TD ALIGN="LEFT" >- desuscribirDeTopico()</TD></TR>
+<TR><TD ALIGN="LEFT" >- enviarMensaje()</TD></TR>
+<TR><TD ALIGN="LEFT" >- enviarTokenAlServidor(token: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >- gestionInfo(nombreArg: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >- guardarNotas()</TD></TR>
+<TR><TD ALIGN="LEFT" >- inicializarChat(view: View)</TD></TR>
+<TR><TD ALIGN="LEFT" >- leerNotas(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >- obtenerUbicacionActual()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onAttach(context: Context)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onDestroy()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onPause()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onResume()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onViewCreated(view: View, savedInstanceState: Bundle)</TD></TR>
+<TR><TD ALIGN="LEFT" >- suscribirATopico()</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+InfoStock68430481[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)InfoStock</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   NOM_ARCHIVO: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   actualizadorMensajes: Runnable [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   chatAdapter: ChatAdapter [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   chatVisible: boolean [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   currentToken: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   dr: DrawerLayout [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   etMensaje: EditText [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   fusedLocationClient: FusedLocationProviderClient [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   handler: Handler [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   latitudSede: double [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   longitudSede: double [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   mapController: IMapController [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   mapView: MapView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   nombre: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   notasEditText: EditText [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   recyclerMensajes: RecyclerView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   switchNotificaciones: Switch [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   tg: ActionBarDrawerToggle [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   traductor: Translator [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   tvDistancia: TextView [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   usuarioActual: String [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >- aplicarIdioma()</TD></TR>
+<TR><TD ALIGN="LEFT" >- cargarMensajes()</TD></TR>
+<TR><TD ALIGN="LEFT" >- cargarUbicacionEmpresa(ticker: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >- configurarNotificaciones()</TD></TR>
+<TR><TD ALIGN="LEFT" >- createNotificationChannel()</TD></TR>
+<TR><TD ALIGN="LEFT" >- desuscribirDeTopico()</TD></TR>
+<TR><TD ALIGN="LEFT" >- enviarMensaje()</TD></TR>
+<TR><TD ALIGN="LEFT" >- enviarTokenAlServidor(token: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ gestionInfo(db2: StockDB)</TD></TR>
+<TR><TD ALIGN="LEFT" >- guardarNotas()</TD></TR>
+<TR><TD ALIGN="LEFT" >- inicializarChat()</TD></TR>
+<TR><TD ALIGN="LEFT" >- leerNotas(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ mostrarNotificacion(context: Context, ticker: String, mensaje: String, remitente: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >- obtenerUbicacionActual()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onConfigurationChanged(newConfig: Configuration)</TD></TR>
+<TR><TD ALIGN="LEFT" ># onCreate(savedInstanceState: Bundle)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onCreateOptionsMenu(menu: Menu): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" ># onDestroy()</TD></TR>
+<TR><TD ALIGN="LEFT" ># onPause()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onRequestPermissionsResult(requestCode: int, permissions: String[], grantResults: int[])</TD></TR>
+<TR><TD ALIGN="LEFT" ># onResume()</TD></TR>
+<TR><TD ALIGN="LEFT" >- suscribirATopico()</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+Mensaje68430481[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Mensaje</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   id: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   remitente: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   texto: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   timestamp: long [1]</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+} 
+} 
+
+'edges    
+ChatAdapter68430481 -> Mensaje68430481[label="mensajes
+[0..*]"];
+FragmentNuevo68430481 -> ChatAdapter68430481[label="chatAdapter
+[0..1]"];
+InfoStock68430481 -> ChatAdapter68430481[label="chatAdapter
+[0..1]"];
+    
+}
+@enduml

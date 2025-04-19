@@ -1,0 +1,150 @@
+@startuml
+
+/' diagram meta data start
+config=StructureConfiguration;
+{
+  "projectClassification": {
+    "searchMode": "OpenProject", // OpenProject, AllProjects
+    "includedProjects": "",
+    "pathEndKeywords": "*.impl",
+    "isClientPath": "",
+    "isClientName": "",
+    "isTestPath": "",
+    "isTestName": "",
+    "isMappingPath": "",
+    "isMappingName": "",
+    "isDataAccessPath": "",
+    "isDataAccessName": "",
+    "isDataStructurePath": "",
+    "isDataStructureName": "",
+    "isInterfaceStructuresPath": "",
+    "isInterfaceStructuresName": "",
+    "isEntryPointPath": "",
+    "isEntryPointName": "",
+    "treatFinalFieldsAsMandatory": false
+  },
+  "graphRestriction": {
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "removeByInheritance": "", // inheritance/annotation based filtering is done in a second step
+    "removeByAnnotation": "",
+    "removeByClassPackage": "", // cleanup the graph after inheritance/annotation based filtering is done
+    "removeByClassName": "",
+    "cutMappings": false,
+    "cutEnum": true,
+    "cutTests": true,
+    "cutClient": true,
+    "cutDataAccess": false,
+    "cutInterfaceStructures": false,
+    "cutDataStructures": false,
+    "cutGetterAndSetter": true,
+    "cutConstructors": true
+  },
+  "graphTraversal": {
+    "forwardDepth": 6,
+    "backwardDepth": 6,
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "hideMappings": false,
+    "hideDataStructures": false,
+    "hidePrivateMethods": true,
+    "hideInterfaceCalls": true, // indirection: implementation -> interface (is hidden) -> implementation
+    "onlyShowApplicationEntryPoints": false, // root node is included
+    "useMethodCallsForStructureDiagram": "ForwardOnly" // ForwardOnly, BothDirections, No
+  },
+  "details": {
+    "aggregation": "GroupByClass", // ByClass, GroupByClass, None
+    "showClassGenericTypes": true,
+    "showMethods": true,
+    "showMethodParameterNames": true,
+    "showMethodParameterTypes": true,
+    "showMethodReturnType": true,
+    "showPackageLevels": 2,
+    "showDetailedClassStructure": true
+  },
+  "rootClass": "com.ibaisologuestoa.acciones500.Saludo",
+  "extensionCallbackMethod": "" // qualified.class.name#methodName - signature: public static String method(String)
+}
+diagram meta data end '/
+
+
+
+digraph g {
+    rankdir="TB"
+    splines=polyline
+    
+
+'nodes 
+subgraph cluster_1435227722 { 
+   	label=ibaisologuestoa
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   subgraph cluster_1099670436 { 
+   	label=acciones500
+	labeljust=l
+	fillcolor="#d8d8d8"
+	style=filled
+   
+   Saludo68430481[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Saludo</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   dialog_log: View [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   dialog_reg: View [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   requestQueue: RequestQueue [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   rutaFotoActual: Uri [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   sharedPrefs: SharedPreferences [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >- abrirCamara()</TD></TR>
+<TR><TD ALIGN="LEFT" >- abrirGaleria()</TD></TR>
+<TR><TD ALIGN="LEFT" >- aplicarIdioma()</TD></TR>
+<TR><TD ALIGN="LEFT" >- autenticarUsuario(email: String, pass: String, dialog: AlertDialog)</TD></TR>
+<TR><TD ALIGN="LEFT" >- cargarImagenUsuario(email: String, imageView: ImageView)</TD></TR>
+<TR><TD ALIGN="LEFT" >- cerrarSesion()</TD></TR>
+<TR><TD ALIGN="LEFT" >- configurarLogin(view: View, dialog: AlertDialog)</TD></TR>
+<TR><TD ALIGN="LEFT" >- configurarRegistro(view: View, dialog: AlertDialog)</TD></TR>
+<TR><TD ALIGN="LEFT" >- configurarVistasDialogo(view: View, dialog: AlertDialog, esLogin: boolean)</TD></TR>
+<TR><TD ALIGN="LEFT" >- crearArchivoImagen(): File</TD></TR>
+<TR><TD ALIGN="LEFT" >- crearCanalNotificaciones()</TD></TR>
+<TR><TD ALIGN="LEFT" >- gestionarNotificaciones()</TD></TR>
+<TR><TD ALIGN="LEFT" >- guardarSesion(email: String, nombre: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >- mostrarDialogo(layout: int, esLogin: boolean)</TD></TR>
+<TR><TD ALIGN="LEFT" >- mostrarError(mensaje: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >- mostrarInterfazBienvenida()</TD></TR>
+<TR><TD ALIGN="LEFT" >- mostrarInterfazLogueado()</TD></TR>
+<TR><TD ALIGN="LEFT" >- mostrarNotificacion()</TD></TR>
+<TR><TD ALIGN="LEFT" >- mostrarSelectorImagen()</TD></TR>
+<TR><TD ALIGN="LEFT" ># onActivityResult(requestCode: int, resultCode: int, data: Intent)</TD></TR>
+<TR><TD ALIGN="LEFT" ># onCreate(savedInstanceState: Bundle)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onRequestPermissionsResult(requestCode: int, permissions: String[], grantResults: int[])</TD></TR>
+<TR><TD ALIGN="LEFT" >- pedirPermisoNotificaciones()</TD></TR>
+<TR><TD ALIGN="LEFT" >- registrarUsuario(nombre: String, email: String, pass: String, bfoto: Bitmap, dialog: AlertDialog)</TD></TR>
+<TR><TD ALIGN="LEFT" >- validarInputs(email: String, password: String): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >- validarRegistro(nombre: String, email: String, password: String, confirmar: String): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >- verificarEstadoAutenticacion()</TD></TR>
+<TR><TD ALIGN="LEFT" >- verificarPermisoCamara()</TD></TR>
+<TR><TD ALIGN="LEFT" >- verificarPermisoGaleria()</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+} 
+} 
+
+'edges    
+
+    
+}
+@enduml

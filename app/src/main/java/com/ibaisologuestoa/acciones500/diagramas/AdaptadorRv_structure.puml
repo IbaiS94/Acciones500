@@ -1,0 +1,161 @@
+@startuml
+
+/' diagram meta data start
+config=StructureConfiguration;
+{
+  "projectClassification": {
+    "searchMode": "OpenProject", // OpenProject, AllProjects
+    "includedProjects": "",
+    "pathEndKeywords": "*.impl",
+    "isClientPath": "",
+    "isClientName": "",
+    "isTestPath": "",
+    "isTestName": "",
+    "isMappingPath": "",
+    "isMappingName": "",
+    "isDataAccessPath": "",
+    "isDataAccessName": "",
+    "isDataStructurePath": "",
+    "isDataStructureName": "",
+    "isInterfaceStructuresPath": "",
+    "isInterfaceStructuresName": "",
+    "isEntryPointPath": "",
+    "isEntryPointName": "",
+    "treatFinalFieldsAsMandatory": false
+  },
+  "graphRestriction": {
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "removeByInheritance": "", // inheritance/annotation based filtering is done in a second step
+    "removeByAnnotation": "",
+    "removeByClassPackage": "", // cleanup the graph after inheritance/annotation based filtering is done
+    "removeByClassName": "",
+    "cutMappings": false,
+    "cutEnum": true,
+    "cutTests": true,
+    "cutClient": true,
+    "cutDataAccess": false,
+    "cutInterfaceStructures": false,
+    "cutDataStructures": false,
+    "cutGetterAndSetter": true,
+    "cutConstructors": true
+  },
+  "graphTraversal": {
+    "forwardDepth": 6,
+    "backwardDepth": 6,
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "hideMappings": false,
+    "hideDataStructures": false,
+    "hidePrivateMethods": true,
+    "hideInterfaceCalls": true, // indirection: implementation -> interface (is hidden) -> implementation
+    "onlyShowApplicationEntryPoints": false, // root node is included
+    "useMethodCallsForStructureDiagram": "ForwardOnly" // ForwardOnly, BothDirections, No
+  },
+  "details": {
+    "aggregation": "GroupByClass", // ByClass, GroupByClass, None
+    "showClassGenericTypes": true,
+    "showMethods": true,
+    "showMethodParameterNames": true,
+    "showMethodParameterTypes": true,
+    "showMethodReturnType": true,
+    "showPackageLevels": 2,
+    "showDetailedClassStructure": true
+  },
+  "rootClass": "com.ibaisologuestoa.acciones500.AdaptadorRv",
+  "extensionCallbackMethod": "" // qualified.class.name#methodName - signature: public static String method(String)
+}
+diagram meta data end '/
+
+
+
+digraph g {
+    rankdir="TB"
+    splines=polyline
+    
+
+'nodes 
+subgraph cluster_1435227722 { 
+   	label=ibaisologuestoa
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   subgraph cluster_1099670436 { 
+   	label=acciones500
+	labeljust=l
+	fillcolor="#d8d8d8"
+	style=filled
+   
+   AdaptadorRv68430481[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AdaptadorRv</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   context: Context [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   listaItems: List&lt;StockItem&gt; [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ onBindViewHolder(holder: MiViewHolder, position: int)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onCreateViewHolder(parent: ViewGroup, viewType: int): MiViewHolder</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+StockDB68430481[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)StockDB</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ actualizar(db: SQLiteDatabase, nombre2: String, favoritos2: Boolean)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ actualizarDesdeAlpaca()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ actualizarDesdeAlpaca(ticker: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ actualizarDetalle(db: SQLiteDatabase, nombre: String, nuevoPrecio: double)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ esFavorito(nombre: String): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >+ insertar(db: SQLiteDatabase, nombre: String, favoritos: Boolean)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ insertarDetalles(db: SQLiteDatabase, nombre: String, descripcion: String, precio: double, similares: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ insertarUbicacion(db: SQLiteDatabase, ticker: String, latitud: double, longitud: double, nombreSede: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ obtenerDescripcion(): Cursor</TD></TR>
+<TR><TD ALIGN="LEFT" >+ obtenerDetallesCompletos(): Cursor</TD></TR>
+<TR><TD ALIGN="LEFT" >+ obtenerNombresYPrecios(): Cursor</TD></TR>
+<TR><TD ALIGN="LEFT" >+ obtenerPrecio(nombreAccion: String): Cursor</TD></TR>
+<TR><TD ALIGN="LEFT" >+ obtenerUbicacion(ticker: String): Cursor</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onCreate(db: SQLiteDatabase)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onUpgrade(db: SQLiteDatabase, oldVersion: int, newVersion: int)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+StockItem68430481[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)StockItem</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+   nombre: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   precio: double [1]</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+} 
+} 
+
+'edges    
+AdaptadorRv68430481 -> StockDB68430481[label="onBindViewHolder() -> esFavorito()"];
+AdaptadorRv68430481 -> StockItem68430481[label="listaItems
+[0..*]"];
+    
+}
+@enduml
