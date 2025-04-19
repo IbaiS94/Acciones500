@@ -154,8 +154,9 @@ public class InfoStock extends AppCompatActivity {
             SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
             String emailus = prefs.getString("currentUser", "");
             String nombreus = prefs.getString("currentUserName", "");
-            String clave = "imagen" + emailus;
+            String clave = "imagen_" + emailus;
             String imgGuardada = prefs.getString(clave, null);
+
 
             ImageView imgV = nav_perfil.findViewById(R.id.imgPerfil);
             if (imgGuardada != null) {
@@ -639,8 +640,8 @@ public class InfoStock extends AppCompatActivity {
                         float[] results = new float[1];
                         Location.distanceBetween(latitudUsuario, longitudUsuario,
                                 latitudSede, longitudSede, results);
-                        float distancia = results[0] / 1000; // en kilómetros
-                        tvDistancia.setText(String.format("Distancia a la sede: %.2f km", distancia));
+                        float distancia = results[0] / 1000;
+                        tvDistancia.setText(String.format(getString(R.string.distancia)+" %.2f km", distancia));
 
                         GeoPoint puntoUsuario = new GeoPoint(latitudUsuario, longitudUsuario);
                         Marker marcadorUsuario = new Marker(mapView);

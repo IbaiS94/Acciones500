@@ -45,5 +45,9 @@
     <string name="alerta_mercados">Market opening alert</string>
     <string name="sede_empresa">Company headquarters</string>
     <string name="nuevo_mensaje">New message: </string>
+    <string name="notiacciones">Activate notifications for this stock</string>
+    <string name="escribe">Write a message...</string>
+    <string name="notash">Write your notes here</string>
+    <string name="distancia">Distance to the headquarters:</string>
 
 </resources>

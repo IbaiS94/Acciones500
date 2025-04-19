@@ -52,6 +52,9 @@ public class Widget extends AppWidgetProvider {
         vistas.setTextViewText(R.id.widget_fecha, "Actualizado: " + t);
         int colorFondo = contexto.getResources().getColor(R.color.widget_fondo, contexto.getTheme());
         vistas.setInt(R.id.widget_layout, "setBackgroundColor", colorFondo);
+
+
+
         Intent intentLanzar = new Intent(contexto, Saludo.class);
         PendingIntent intentoLanzar = PendingIntent.getActivity(contexto, 0, intentLanzar, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         vistas.setOnClickPendingIntent(R.id.widget_layout, intentoLanzar);

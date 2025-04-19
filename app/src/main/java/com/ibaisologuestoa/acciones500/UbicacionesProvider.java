@@ -15,15 +15,10 @@ import androidx.annotation.Nullable;
 
 public class UbicacionesProvider extends ContentProvider {
 
-    // Definiciones para el Content Provider
     public static final String AUTORIDAD = "com.ibaisologuestoa.acciones500.ubicacionesprovider";
     public static final Uri URI_CONTENIDO = Uri.parse("content://" + AUTORIDAD + "/ubicaciones");
-
-    // Códigos para el UriMatcher
     private static final int UBICACIONES = 1;
     private static final int UBICACION_ID = 2;
-
-    // UriMatcher para determinar qué tipo de URI se está solicitando
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {

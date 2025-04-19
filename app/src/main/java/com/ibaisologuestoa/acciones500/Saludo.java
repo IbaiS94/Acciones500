@@ -87,18 +87,18 @@ public class Saludo extends AppCompatActivity {
     }
 
     private void verificarEstadoAutenticacion() {
-        boolean isLoggedIn = sharedPrefs.getBoolean("isLoggedIn", false);
-        boolean isFirstTime = sharedPrefs.getBoolean("firstTime", true);
+        boolean isLogueado = sharedPrefs.getBoolean("isLogueado", false);
+        boolean isPrimera = sharedPrefs.getBoolean("Primera", true);
 
-        if (isFirstTime) {
+        if (isPrimera) {
             SharedPreferences.Editor editor = sharedPrefs.edit();
-            editor.putBoolean("firstTime", false);
-            editor.putBoolean("isLoggedIn", false);
+            editor.putBoolean("Primera", false);
+            editor.putBoolean("isLogueado", false);
             editor.apply();
-            isLoggedIn = false;
+            isLogueado = false;
         }
 
-        if (isLoggedIn) {
+        if (isLogueado) {
             mostrarInterfazLogueado();
         } else {
             mostrarInterfazBienvenida();
@@ -403,10 +403,10 @@ public class Saludo extends AppCompatActivity {
 
     private void guardarSesion(String email, String nombre) {
         SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putBoolean("isLoggedIn", true);
+        editor.putBoolean("isLogueado", true);
         editor.putString("currentUser", email);
         editor.putString("currentUserName", nombre);
-        editor.putBoolean("firstTime", false);
+        editor.putBoolean("Primera", false);
         editor.apply();
         aplicarIdioma();
     }
@@ -543,12 +543,12 @@ public class Saludo extends AppCompatActivity {
     }
 
     private File crearArchivoImagen() {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String fileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        String tiempost = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String archivoimg = "JPEG_" + tiempost + "_";
+        File donde = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
         try {
-            return File.createTempFile(fileName, ".jpg", storageDir);
+            return File.createTempFile(archivoimg, ".jpg", donde);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -578,13 +578,13 @@ public class Saludo extends AppCompatActivity {
 
             } catch (IOException e) {
                 e.printStackTrace();
-                Toast.makeText(this, "Error processing image", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error con la imagen", Toast.LENGTH_SHORT).show();
             }
         } else if (resultCode == RESULT_CANCELED) {
             if (rutaFotoActual != null) {
                 new File(rutaFotoActual.getPath()).delete();
             }
-            Toast.makeText(this, "Operation canceled", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Operacion cancelada", Toast.LENGTH_SHORT).show();
         }
     }
 

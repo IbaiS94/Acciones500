@@ -45,5 +45,9 @@
     <string name="alerta_mercados">Marktöffnungswarnung</string>
     <string name="sede_empresa">Firmensitz</string>
     <string name="nuevo_mensaje">Neue Nachricht: </string>
+    <string name="notiacciones">Benachrichtigungen für diesen Artikel aktivieren</string>
+    <string name="escribe">Schreibe eine Nachricht...</string>
+    <string name="notash">Schreibe deine Notizen hier</string>
+    <string name="distancia">Entfernung zum Hauptsitz:</string>
 
 </resources>

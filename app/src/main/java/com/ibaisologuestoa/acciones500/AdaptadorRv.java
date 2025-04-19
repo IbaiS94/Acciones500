@@ -75,7 +75,6 @@ public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> 
             favBot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // Captura la posición antes de mostrar el diálogo
                     final int position = getAdapterPosition();
                     if (position == RecyclerView.NO_POSITION) return;
                     Log.d("AdaptadorRv", "Favorito clicked position=" + position);
@@ -98,11 +97,9 @@ public class AdaptadorRv extends RecyclerView.Adapter<AdaptadorRv.MiViewHolder> 
                                         favBot.setTag("fav_no");
                                         nowFav = false;
                                     }
-                                    // Actualiza la base de datos
                                     StockItem currentItem = listaItems.get(position);
                                     dbHelper.actualizar(db, currentItem.nombre, nowFav);
                                     db.close();
-                                    // Refresca el item
                                     notifyItemChanged(position);
                                 }
                             })

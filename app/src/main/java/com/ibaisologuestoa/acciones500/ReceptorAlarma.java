@@ -17,13 +17,13 @@ public class ReceptorAlarma extends BroadcastReceiver {
     public void onReceive(Context contexto, Intent intent) {
         if(intent.getAction().equals("ALERTA_APERTURA_MERCADOS")) {
             mostrarNotificacion(contexto);
-            AlarmaMercados.programar(contexto, 8, 0);
+            AlarmaMercados.programar(contexto, 15, 30);
         }
         if(intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
             SharedPreferences preferencias = contexto.getSharedPreferences("config_alarmas", MODE_PRIVATE);
 
             if(preferencias.getBoolean("alarma_activa", false)) {
-                AlarmaMercados.programar(contexto, 8, 0);
+                AlarmaMercados.programar(contexto, 15, 30);
             }
         }
     }

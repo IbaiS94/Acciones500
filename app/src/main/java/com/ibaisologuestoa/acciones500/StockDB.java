@@ -18,7 +18,7 @@ public class StockDB extends SQLiteOpenHelper {
     private static final int DB_VERSION = 1;
 
     private static final String ALPACA_API_KEY = "PKN6072L18KDD23KTP01";
-    private static final String ALPACA_SECRET_KEY = "86emGQ1bud3gkvNJxbQmKm8MYV4QlcogkeNKSChz";
+    private static final String ALPACA_SECRET_KEY = "86emGQ1bud3gkvNJxbQmKm8MYV4QlcogkeNKSChz"; // habria que hacerlo mas seguro >:(
     private static final String ALPACA_BASE_URL = "https://data.alpaca.markets/v2/stocks/";
 
     public StockDB(Context context) {

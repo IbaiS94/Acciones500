@@ -45,4 +45,8 @@
     <string name="alerta_mercados">Aviso de apertura de mercados</string>
     <string name="sede_empresa">Sede de la empresa</string>
     <string name="nuevo_mensaje">Nuevo mensaje: </string>
+    <string name="notiacciones">Activar notificaciones para este stock</string>
+    <string name="escribe">Escribe un mensaje...</string>
+    <string name="notash">Escribe tus notas aquí</string>
+    <string name="distancia">Distancia a la sede:</string>
 </resources>

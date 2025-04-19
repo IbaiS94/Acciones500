@@ -143,7 +143,8 @@
                             android:textSize="18sp"
                             android:gravity="top"
                             android:inputType="textMultiLine"
-                            android:scrollbars="vertical"/>
+                            android:scrollbars="vertical"
+                            android:hint="@string/notash"/>
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -224,7 +225,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/barra_menu"
-            app:layout_constraintHeight_percent="0.6">
+            app:layout_constraintHeight_percent="0.8">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -265,14 +266,13 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:padding="8dp"
-                    android:background="#F5F5F5"
                     app:layout_constraintBottom_toTopOf="@id/layout_enviar_mensaje">
 
                     <Switch
                         android:id="@+id/switch_notificaciones"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Activar notificaciones para este stock"
+                        android:text="@string/notiacciones"
                         android:padding="8dp"/>
                 </LinearLayout>
 
@@ -289,7 +289,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:hint="Escribe un mensaje..."
+                        android:hint="@string/escribe"
                         android:inputType="textMultiLine"
                         android:maxLines="4"
                         android:padding="8dp" />
