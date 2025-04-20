@@ -485,9 +485,6 @@ public class Saludo extends AppCompatActivity {
                 case PERMISSION_CODE_GALLERY:
                     abrirGaleria();
                     break;
-                case NOTIFICATION_PERMISSION_CODE:
-                             mostrarNotificacion();
-                             break;
             }
         } else {
             Toast.makeText(this, "Permiso denegado", Toast.LENGTH_SHORT).show();

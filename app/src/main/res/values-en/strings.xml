@@ -41,7 +41,7 @@
     <string name="selecciona_accion_widget">Select an action for the widget</string>
     <string name="configurar">Configure</string>
     <string name="refresh">Refresh</string>
-    <string name="alertas">Alerts</string>
+    <string name="alertas">🚨Alerts🚨</string>
     <string name="alerta_mercados">Market opening alert</string>
     <string name="sede_empresa">Company headquarters</string>
     <string name="nuevo_mensaje">New message: </string>

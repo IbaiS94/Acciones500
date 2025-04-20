@@ -74,7 +74,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MensajeViewHol
             holder.nombreRemitente.setText(mensaje.getRemitente());
         }
 
-        String hora = formatoHora.format(new Date(mensaje.getTimestamp()));
+        String hora = formatoHora.format(new Date(mensaje.getTs()));
         holder.horaMensaje.setText(hora);
     }
 

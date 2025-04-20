@@ -4,13 +4,13 @@ public class Mensaje {
     private int id;
     private String texto;
     private String remitente;
-    private long timestamp;
+    private long ts;
 
-    public Mensaje(int id, String texto, String remitente, long timestamp) {
+    public Mensaje(int id, String texto, String remitente, long ts) {
         this.id = id;
         this.texto = texto;
         this.remitente = remitente;
-        this.timestamp = timestamp;
+        this.ts = ts;
     }
 
     public int getId() {
@@ -25,7 +25,7 @@ public class Mensaje {
         return remitente;
     }
 
-    public long getTimestamp() {
-        return timestamp;
+    public long getTs() {
+        return ts;
     }
 }

@@ -41,7 +41,7 @@
     <string name="selecciona_accion_widget">Aktion für das Widget auswählen</string>
     <string name="configurar">Konfigurieren</string>
     <string name="refresh">Aktualisieren</string>
-    <string name="alertas">Benachrichtigungen</string>
+    <string name="alertas">🚨Benachrichtigungen🚨</string>
     <string name="alerta_mercados">Marktöffnungswarnung</string>
     <string name="sede_empresa">Firmensitz</string>
     <string name="nuevo_mensaje">Neue Nachricht: </string>

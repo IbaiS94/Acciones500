@@ -1,0 +1,260 @@
+@startuml
+
+package "com.ibaisologuestoa.acciones500" {
+  package database {
+    class StockDB {
+      +actualizar(db: SQLiteDatabase, nombre2: String, favoritos2: Boolean)
+      +actualizarDesdeAlpaca()
+      +actualizarDesdeAlpaca(ticker: String)
+      +actualizarDetalle(db: SQLiteDatabase, nombre: String, nuevoPrecio: double)
+      +esFavorito(nombre: String): boolean
+      +insertar(db: SQLiteDatabase, nombre: String, favoritos: Boolean)
+      +insertarDetalles(db: SQLiteDatabase, nombre: String, descripcion: String, precio: double, similares: String)
+      +insertarUbicacion(db: SQLiteDatabase, ticker: String, latitud: double, longitud: double, nombreSede: String)
+      +obtenerDescripcion(): Cursor
+      +obtenerDetallesCompletos(): Cursor
+      +obtenerNombresYPrecios(): Cursor
+      +obtenerPrecio(nombreAccion: String): Cursor
+      +obtenerUbicacion(ticker: String): Cursor
+      +onCreate(db: SQLiteDatabase)
+      +onUpgrade(db: SQLiteDatabase, oldVersion: int, newVersion: int)
+    }
+
+    class UbicacionesProvider {
+      -mDbHelper: StockDB
+      +delete(uri: Uri, selection: String, selectionArgs: String[]): int
+      +getType(uri: Uri): String
+      +getUbicacionByTickerUri(ticker: String): Uri
+      +insert(uri: Uri, values: ContentValues): Uri
+      +onCreate(): boolean
+      +query(uri: Uri, projection: String[], selection: String, selectionArgs: String[], sortOrder: String): Cursor
+      +update(uri: Uri, values: ContentValues, selection: String, selectionArgs: String[]): int
+    }
+  }
+
+  package ui {
+    class MainActivity {
+      -dr: DrawerLayout
+      -modfavorito: boolean
+      -nombre: String
+      -tg: ActionBarDrawerToggle
+      +logicaLista()
+      +onBackPressed()
+      +onCreate(savedInstanceState: Bundle)
+      +onCreateOptionsMenu(menu: Menu): boolean
+      +onNombreActualizado(nombreActualizado: String)
+      +onResume()
+      -aplicarIdioma()
+      -restaurarTema()
+    }
+
+    class FragmentNuevo {
+      -NOM_ARCHIVO: String
+      -actualizadorMensajes: Runnable
+      -chatAdapter: ChatAdapter
+      -chatVisible: boolean
+      -currentToken: String
+      -etMensaje: EditText
+      -fusedLocationClient: FusedLocationProviderClient
+      -handler: Handler
+      -latitudSede: double
+      -listener: OnNombreActualizadoListener
+      -longitudSede: double
+      -mapController: IMapController
+      -mapView: MapView
+      +nombre: String
+      -notasEditText: EditText
+      -recyclerMensajes: RecyclerView
+      -switchNotificaciones: Switch
+      -traductor: Translator
+      -tvDistancia: TextView
+      -usuarioActual: String
+      +onAttach(context: Context)
+      +onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View
+      +onDestroy()
+      +onPause()
+      +onResume()
+      +onViewCreated(view: View, savedInstanceState: Bundle)
+      -cargarMensajes()
+      -cargarUbicacionEmpresa(ticker: String)
+      -configurarNotificaciones()
+      -createNotificationChannel()
+      -desuscribirDeTopico()
+      -enviarMensaje()
+      -enviarTokenAlServidor(token: String)
+      -gestionInfo(nombreArg: String)
+      -guardarNotas()
+      -inicializarChat(view: View)
+      -leerNotas(): String
+      -obtenerUbicacionActual()
+      -suscribirATopico()
+    }
+
+    class InfoStock {
+      -NOM_ARCHIVO: String
+      -actualizadorMensajes: Runnable
+      -chatAdapter: ChatAdapter
+      -chatVisible: boolean
+      -currentToken: String
+      -dr: DrawerLayout
+      -etMensaje: EditText
+      -fusedLocationClient: FusedLocationProviderClient
+      -handler: Handler
+      -latitudSede: double
+      -longitudSede: double
+      -mapController: IMapController
+      -mapView: MapView
+      -nombre: String
+      -notasEditText: EditText
+      -recyclerMensajes: RecyclerView
+      -switchNotificaciones: Switch
+      -tg: ActionBarDrawerToggle
+      -traductor: Translator
+      -tvDistancia: TextView
+      -usuarioActual: String
+      +gestionInfo(db2: StockDB)
+      +mostrarNotificacion(context: Context, ticker: String, mensaje: String, remitente: String)
+      +onConfigurationChanged(newConfig: Configuration)
+      +onCreate(savedInstanceState: Bundle)
+      +onCreateOptionsMenu(menu: Menu): boolean
+      +onDestroy()
+      +onPause()
+      +onRequestPermissionsResult(requestCode: int, permissions: String[], grantResults: int[])
+      +onResume()
+      -aplicarIdioma()
+      -cargarMensajes()
+      -cargarUbicacionEmpresa(ticker: String)
+      -configurarNotificaciones()
+      -createNotificationChannel()
+      -desuscribirDeTopico()
+      -enviarMensaje()
+      -enviarTokenAlServidor(token: String)
+      -guardarNotas()
+      -inicializarChat()
+      -leerNotas(): String
+      -obtenerUbicacionActual()
+      -suscribirATopico()
+    }
+
+    class Saludo {
+      -dialog_log: View
+      -dialog_reg: View
+      -requestQueue: RequestQueue
+      -rutaFotoActual: Uri
+      -sharedPrefs: SharedPreferences
+      +onActivityResult(requestCode: int, resultCode: int, data: Intent)
+      +onCreate(savedInstanceState: Bundle)
+      +onRequestPermissionsResult(requestCode: int, permissions: String[], grantResults: int[])
+      -abrirCamara()
+      -abrirGaleria()
+      -aplicarIdioma()
+      -autenticarUsuario(email: String, pass: String, dialog: AlertDialog)
+      -cargarImagenUsuario(email: String, imageView: ImageView)
+      -cerrarSesion()
+      -configurarLogin(view: View, dialog: AlertDialog)
+      -configurarRegistro(view: View, dialog: AlertDialog)
+      -configurarVistasDialogo(view: View, dialog: AlertDialog, esLogin: boolean)
+      -crearArchivoImagen(): File
+      -crearCanalNotificaciones()
+      -gestionarNotificaciones()
+      -guardarSesion(email: String, nombre: String)
+      -mostrarDialogo(layout: int, esLogin: boolean)
+      -mostrarError(mensaje: String)
+      -mostrarInterfazBienvenida()
+      -mostrarInterfazLogueado()
+      -mostrarNotificacion()
+      -mostrarSelectorImagen()
+      -pedirPermisoNotificaciones()
+      -registrarUsuario(nombre: String, email: String, pass: String, bfoto: Bitmap, dialog: AlertDialog)
+      -validarInputs(email: String, password: String): boolean
+      -validarRegistro(nombre: String, email: String, password: String, confirmar: String): boolean
+      -verificarEstadoAutenticacion()
+      -verificarPermisoCamara()
+      -verificarPermisoGaleria()
+    }
+  }
+
+  package chat {
+    class ChatAdapter {
+      -context: Context
+      -formatoHora: SimpleDateFormat
+      -mensajes: List<Mensaje>
+      -usuarioActual: String
+      +agregarMensaje(mensaje: Mensaje)
+      +getItemViewType(position: int): int
+      +onBindViewHolder(holder: MensajeViewHolder, position: int)
+      +onCreateViewHolder(parent: ViewGroup, viewType: int): MensajeViewHolder
+    }
+
+    class Mensaje {
+      -id: int
+      -remitente: String
+      -texto: String
+      -timestamp: long
+    }
+
+    class ChatFCM {
+      +onMessageReceived(remoteMessage: RemoteMessage)
+    }
+  }
+
+  package alarmas {
+    class AlarmaMercados {
+      +cancelar(contexto: Context)
+      +programar(contexto: Context, hora: int, minuto: int)
+    }
+
+    class ReceptorAlarma {
+      -mostrarNotificacion(contexto: Context)
+      +onReceive(contexto: Context, intent: Intent)
+    }
+  }
+
+  package widget {
+    class Widget {
+      #actualizarWidget(contexto: Context, gestorWidgets: AppWidgetManager, idWidget: int)
+      +onDisabled(contexto: Context)
+      +onEnabled(contexto: Context)
+      +onReceive(contexto: Context, intent: Intent)
+      +onUpdate(contexto: Context, gestorWidgets: AppWidgetManager, idsWidgets: int[])
+      -programarActualizacionAutomatica(contexto: Context)
+    }
+
+    class Widget_conf {
+      -appWidgetId: int
+      -spinnerAcciones: Spinner
+      -stockDB: StockDB
+      -cargarAccionesEnSpinner()
+      #guardarPreferenciaAccion(context: Context, appWidgetId: int, accion: String)
+      -obtenerTodosLosNombresDeAcciones(): List<String>
+      #onCreate(savedInstanceState: Bundle)
+    }
+  }
+}
+
+' Relaciones completas actualizadas
+StockDB "1" --* UbicacionesProvider
+StockDB "1" --* Widget_conf
+StockDB "1" --* FragmentNuevo
+StockDB "1" --* MainActivity
+StockDB "1" --* InfoStock
+
+ChatAdapter "1" --* FragmentNuevo
+ChatAdapter "1" --* InfoStock
+ChatAdapter "1" -- "0..*" Mensaje
+
+ChatFCM --> InfoStock : usa > mostrarNotificacion()
+
+MainActivity --> AlarmaMercados
+AlarmaMercados ..> ReceptorAlarma : triggers
+FragmentNuevo --> MainActivity
+
+Widget_conf ..> Widget : configura
+Widget_conf "1" --* StockDB
+
+InfoStock ..> StockDB : usa
+InfoStock ..> ChatAdapter
+
+
+
+@enduml
